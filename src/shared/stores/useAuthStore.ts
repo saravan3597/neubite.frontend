@@ -1,6 +1,12 @@
 import { create } from 'zustand';
-import type { User } from '../services/AuthService';
-import { AuthService } from '../services/AuthService';
+import { handleSignIn, handleSignOut, fetchUserAttributes, getUserSession } from '../../features/auth/services/authService';
+
+interface User {
+  email?: string;
+  name?: string;
+  username?: string;
+  [key: string]: any;
+}
 
 interface AuthState {
   user: User | null;
@@ -9,7 +15,7 @@ interface AuthState {
   isLoading: boolean;
   
   // Actions
-  login: (username: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   checkSession: () => Promise<void>;
 }
@@ -20,11 +26,18 @@ export const useAuthStore = create<AuthState>((set) => ({
   isAuthenticated: false,
   isLoading: true,
 
-  login: async (username, password) => {
+  login: async (email, password) => {
     try {
       set({ isLoading: true });
-      const { user, token } = await AuthService.login(username, password);
-      set({ user, token, isAuthenticated: true, isLoading: false });
+      const { success, isSignedIn } = await handleSignIn(email, password);
+      
+      if (success && isSignedIn) {
+        const userDetails = await fetchUserAttributes();
+        set({ isAuthenticated: true, isLoading: false, user: userDetails });
+      } else {
+        // Here you would handle MFA or required password resets via nextStep
+        set({ isAuthenticated: false, isLoading: false });
+      }
     } catch (error) {
       set({ isLoading: false });
       throw error;
@@ -32,22 +45,22 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   logout: async () => {
-    await AuthService.logout();
+    await handleSignOut();
     set({ user: null, token: null, isAuthenticated: false });
   },
 
   checkSession: async () => {
     try {
       set({ isLoading: true });
-      const token = await AuthService.getSession();
-      if (token) {
-        // Here we ideally fetch user info from token payload or API
-        set({ token, isAuthenticated: true, isLoading: false, user: { id: 'mock', email: 'mock@example.com', username: 'mock_user' } });
+      const session = await getUserSession();
+      if (session) {
+        const userDetails = await fetchUserAttributes();
+        set({ isAuthenticated: true, isLoading: false, user: userDetails });
       } else {
-        set({ isAuthenticated: false, isLoading: false });
+        set({ isAuthenticated: false, isLoading: false, user: null });
       }
     } catch (error) {
-      set({ isAuthenticated: false, isLoading: false });
+      set({ isAuthenticated: false, isLoading: false, user: null });
     }
   }
 }));
