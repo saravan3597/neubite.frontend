@@ -1,5 +1,4 @@
 import React from 'react';
-import { PREP_TIME_MIN, PREP_TIME_MAX, PREP_TIME_STEP } from '../hooks/useRecipeSuggestions';
 
 // ── Props ─────────────────────────────────────────────────────────────────────
 
@@ -10,27 +9,18 @@ interface PrepTimeSliderProps {
 
 // ── Build step options ────────────────────────────────────────────────────────
 
-const STEPS: number[] = [];
-for (let t = PREP_TIME_MIN; t <= PREP_TIME_MAX; t += PREP_TIME_STEP) {
-  STEPS.push(t);
-}
+const STEPS: number[] = [20, 30, 60];
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export const PrepTimeSlider: React.FC<PrepTimeSliderProps> = ({ value, onChange }) => {
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex items-center justify-between">
-        <span className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
-          Max prep time
-        </span>
-        <span className="text-sm font-bold text-accent-primary">
-          Up to {value} min
-        </span>
-      </div>
+    <div className="flex items-center gap-4">
+      <span className="text-sm font-medium text-text-secondary shrink-0">
+        Prep under
+      </span>
 
-      {/* Pill row — scrolls horizontally on narrow screens */}
-      <div className="flex gap-1.5 overflow-x-auto pb-1 -mb-1 scrollbar-none">
+      <div className="flex items-center p-1 bg-bg-secondary rounded-xl border border-bg-secondary/50">
         {STEPS.map((step) => {
           const isActive = step === value;
           return (
@@ -38,10 +28,10 @@ export const PrepTimeSlider: React.FC<PrepTimeSliderProps> = ({ value, onChange 
               key={step}
               id={`prep-time-${step}`}
               onClick={() => onChange(step)}
-              className={`shrink-0 px-3 py-2 rounded-lg text-xs font-semibold border transition-all duration-150 ${
+              className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 ${
                 isActive
-                  ? 'bg-accent-primary border-accent-primary text-white shadow-sm'
-                  : 'bg-bg-secondary border-bg-secondary text-text-secondary hover:border-accent-primary/40 hover:text-accent-primary'
+                  ? 'bg-bg-primary text-accent-primary shadow-sm shadow-black/5'
+                  : 'text-text-secondary hover:text-text-primary hover:bg-bg-primary/40'
               }`}
             >
               {step} min

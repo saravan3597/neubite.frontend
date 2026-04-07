@@ -1,5 +1,6 @@
-import React from 'react';
-import { useGroceryPantryStore } from '../../../shared/stores/useGroceryPantryStore';
+import React, { useState } from 'react';
+import { useGroceryPantryStore, type PantryUnit } from '../../../shared/stores/useGroceryPantryStore';
+import { IntakeModal } from './IntakeModal';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -36,24 +37,62 @@ const ExpiryBadge: React.FC<{ iso: string }> = ({ iso }) => {
 // ── Component ────────────────────────────────────────────────────────────────
 
 export const PantrySection: React.FC = () => {
-  const { pantryItems, removePantryItem } = useGroceryPantryStore();
+  const { pantryItems, removePantryItem, addPantryItem } = useGroceryPantryStore();
+  const [newItemName, setNewItemName] = useState('');
+  const [pendingItemName, setPendingItemName] = useState<string | null>(null);
+
+  const handleAdd = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newItemName.trim()) return;
+    setPendingItemName(newItemName.trim());
+  };
+
+  const handleModalSave = (details: { quantity: number; unit: PantryUnit; expiryDate: string }) => {
+    if (!pendingItemName) return;
+    addPantryItem({
+      name: pendingItemName,
+      ...details
+    });
+    setPendingItemName(null);
+    setNewItemName('');
+  };
+
+  const handleModalCancel = () => {
+    setPendingItemName(null);
+  };
 
   return (
-    <div className="bg-bg-primary rounded-2xl border border-bg-secondary overflow-hidden">
+    <>
+      <div className="bg-bg-primary rounded-2xl border border-bg-secondary overflow-hidden">
       {/* Header */}
-      <div className="px-5 py-4 border-b border-bg-secondary flex items-center gap-2.5">
-        <div className="w-7 h-7 rounded-lg bg-status-success/10 flex items-center justify-center">
-          <svg className="w-3.5 h-3.5 text-status-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-              d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-          </svg>
+      <div className="px-5 py-4 border-b border-bg-secondary flex items-center justify-between flex-wrap gap-4">
+        <div className="flex items-center gap-2.5">
+          <div className="w-7 h-7 rounded-lg bg-status-success/10 flex items-center justify-center">
+            <svg className="w-3.5 h-3.5 text-status-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+            </svg>
+          </div>
+          <h2 className="text-base font-semibold text-text-primary">Pantry</h2>
+          {pantryItems.length > 0 && (
+            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-status-success/10 text-status-success">
+              {pantryItems.length}
+            </span>
+          )}
         </div>
-        <h2 className="text-base font-semibold text-text-primary">Pantry</h2>
-        {pantryItems.length > 0 && (
-          <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-status-success/10 text-status-success">
-            {pantryItems.length}
-          </span>
-        )}
+        
+        <form onSubmit={handleAdd} className="flex gap-2 min-w-[200px] flex-1 sm:flex-none justify-end">
+          <input
+            type="text"
+            value={newItemName}
+            onChange={(e) => setNewItemName(e.target.value)}
+            placeholder="Add directly to pantry..."
+            className="px-3 py-1.5 text-sm bg-bg-secondary border-none rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-primary flex-1 sm:w-48 text-text-primary placeholder:text-text-secondary"
+          />
+          <button type="submit" className="px-3 py-1.5 text-sm bg-status-success/10 text-status-success hover:bg-status-success/20 rounded-lg transition-colors font-medium">
+            Add
+          </button>
+        </form>
       </div>
 
       {/* Content */}
@@ -107,6 +146,15 @@ export const PantrySection: React.FC = () => {
           </table>
         </div>
       )}
-    </div>
+      </div>
+
+      {pendingItemName && (
+        <IntakeModal
+          itemName={pendingItemName}
+          onSave={handleModalSave}
+          onCancel={handleModalCancel}
+        />
+      )}
+    </>
   );
 };

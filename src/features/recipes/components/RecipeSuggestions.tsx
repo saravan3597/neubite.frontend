@@ -3,7 +3,9 @@ import { useRecipeSuggestions } from '../hooks/useRecipeSuggestions';
 import { useRecipeStore } from '../../../shared/stores/useRecipeStore';
 import { PrepTimeSlider } from './PrepTimeSlider';
 import { RecipeCard } from './RecipeCard';
+import { RecipeModal } from './RecipeModal';
 import { getTimeOfDay, getTimeOfDayLabel } from '../services/recipeAiService';
+import type { Recipe } from '../types/recipe.types';
 
 // ── Loading skeleton ──────────────────────────────────────────────────────────
 
@@ -29,6 +31,7 @@ export const RecipeSuggestions: React.FC = () => {
   const { recipes, isLoading, error, maxPrepTime, setMaxPrepTime, refresh } =
     useRecipeSuggestions();
   const { saveRecipe, unsaveRecipe, isSaved } = useRecipeStore();
+  const [selectedRecipe, setSelectedRecipe] = React.useState<Recipe | null>(null);
 
   const tod      = getTimeOfDay();
   const greeting = getTimeOfDayLabel(tod);
@@ -101,12 +104,19 @@ export const RecipeSuggestions: React.FC = () => {
                   isSaved={isSaved(recipe.id)}
                   onSave={saveRecipe}
                   onUnsave={unsaveRecipe}
+                  onClick={() => setSelectedRecipe(recipe)}
                 />
               ))
             }
           </div>
         )}
       </div>
+      
+      {/* Detail Modal */}
+      <RecipeModal 
+        recipe={selectedRecipe} 
+        onClose={() => setSelectedRecipe(null)} 
+      />
     </div>
   );
 };

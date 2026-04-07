@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useRecipeStore } from '../../../shared/stores/useRecipeStore';
 import { RecipeCard } from './RecipeCard';
+import { RecipeModal } from './RecipeModal';
+import type { Recipe } from '../types/recipe.types';
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export const SavedRecipes: React.FC = () => {
   const { savedRecipes, saveRecipe, unsaveRecipe, isSaved } = useRecipeStore();
+  const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
 
   // Auto-expand when recipes are saved; collapse when empty
   const [isExpanded, setIsExpanded] = useState(savedRecipes.length > 0);
@@ -71,6 +74,7 @@ export const SavedRecipes: React.FC = () => {
                     isSaved={isSaved(recipe.id)}
                     onSave={saveRecipe}
                     onUnsave={unsaveRecipe}
+                    onClick={() => setSelectedRecipe(recipe)}
                   />
                 ))}
               </div>
@@ -78,6 +82,12 @@ export const SavedRecipes: React.FC = () => {
           </div>
         </>
       )}
+
+      {/* Detail Modal */}
+      <RecipeModal 
+        recipe={selectedRecipe} 
+        onClose={() => setSelectedRecipe(null)} 
+      />
     </div>
   );
 };

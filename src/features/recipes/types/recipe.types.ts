@@ -24,6 +24,8 @@ export interface Recipe {
   timeToCook: number; // minutes
   imageUrl?: string;
   ingredients: Ingredient[];
+  instructions?: string[];
+
   nutritionalData: NutritionalData;
   mealType: MealType;
   tags: string[];

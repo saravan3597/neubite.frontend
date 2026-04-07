@@ -32,30 +32,32 @@ export const Dashboard: React.FC = () => {
         Welcome back, <span className="font-semibold text-text-primary">{firstName}</span>. Here are your personalised recipe suggestions for today.
       </p>
 
-      {/* Stats row — 1 col mobile, 3 col sm+ */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <StatCard
-          label="Saved recipes"
-          value={savedRecipes.length}
-          sub={savedRecipes.length === 0 ? 'Favourite a recipe below' : 'recipes saved'}
-        />
-        <StatCard
-          label="Pantry items"
-          value={pantryItems.length}
-          sub={pantryItems.length === 0 ? 'Add via Pantry page' : 'ingredients tracked'}
-        />
-        <StatCard
-          label="To buy"
-          value={unpurchasedCount}
-          sub={unpurchasedCount === 0 ? 'List is clear' : 'on grocery list'}
-        />
-      </div>
-
       {/* AI recipe suggestions */}
       <RecipeSuggestions />
 
-      {/* Saved / favourited recipes */}
-      <SavedRecipes />
+      <div className="border-t border-bg-secondary pt-6 space-y-6">
+        {/* Stats row — 1 col mobile, 3 col sm+ */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <StatCard
+            label="Saved recipes"
+            value={savedRecipes.length}
+            sub={savedRecipes.length === 0 ? 'Favourite a recipe below' : 'recipes saved'}
+          />
+          <StatCard
+            label="Pantry items"
+            value={pantryItems.length}
+            sub={pantryItems.length === 0 ? 'Add via Pantry page' : 'ingredients tracked'}
+          />
+          <StatCard
+            label="To buy"
+            value={unpurchasedCount}
+            sub={unpurchasedCount === 0 ? 'List is clear' : 'on grocery list'}
+          />
+        </div>
+
+        {/* Saved / favourited recipes */}
+        <SavedRecipes />
+      </div>
     </div>
   );
 };
