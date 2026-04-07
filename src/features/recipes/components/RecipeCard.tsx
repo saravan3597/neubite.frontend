@@ -44,22 +44,19 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({
 
   return (
     <div
-      className="group relative bg-bg-primary rounded-2xl border border-bg-secondary overflow-hidden hover:border-accent-primary/40 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 flex flex-col cursor-pointer p-5"
+      className="group relative h-full bg-bg-primary rounded-2xl border border-bg-secondary overflow-hidden hover:border-accent-primary/40 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 flex flex-col cursor-pointer p-5"
       onClick={() => onClick?.(id)}
     >
-      <div className="flex justify-between items-start mb-4 gap-3">
-        <div>
-          <h3 className="text-[1.1rem] leading-snug font-bold text-text-primary group-hover:text-accent-primary transition-colors line-clamp-1 mb-1">
-            {title}
-          </h3>
-          {description && <p className="text-xs text-text-secondary line-clamp-2 leading-relaxed">{description}</p>}
-        </div>
+      <div className="flex justify-between items-start mb-2 gap-3">
+        <h3 className="text-[1.1rem] leading-snug font-bold text-text-primary group-hover:text-accent-primary transition-colors pr-2 line-clamp-2">
+          {title}
+        </h3>
         
         {/* Favourite button */}
         <button
           id={`recipe-save-${id}`}
           onClick={handleSaveClick}
-          className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center border transition-all duration-150 shadow-sm ${
+          className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center border transition-all duration-150 shadow-sm mt-0.5 ${
             isSaved
               ? 'bg-accent-primary border-accent-primary text-white'
               : 'bg-bg-primary/90 border-bg-secondary text-text-secondary hover:border-accent-primary hover:text-accent-primary'
@@ -70,8 +67,14 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({
         </button>
       </div>
 
+      {description && (
+        <p className="text-xs text-text-secondary line-clamp-2 leading-relaxed mb-4">
+          {description}
+        </p>
+      )}
+
       {/* Nutrition pills */}
-      <div className="flex gap-2">
+      <div className="flex gap-2 mt-auto pt-2">
         <div className="flex items-center gap-1 px-2.5 py-1 bg-accent-primary/8 rounded-lg">
           <span className="text-[10px] font-bold text-accent-primary uppercase tracking-wide">Cal</span>
           <span className="text-xs font-semibold text-text-primary">{nutritionalData.calories}</span>

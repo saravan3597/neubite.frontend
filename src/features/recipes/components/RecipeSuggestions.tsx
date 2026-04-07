@@ -10,17 +10,18 @@ import type { Recipe } from '../types/recipe.types';
 // ── Loading skeleton ──────────────────────────────────────────────────────────
 
 const RecipeSkeleton = () => (
-  <div className="bg-bg-primary rounded-2xl border border-bg-secondary overflow-hidden flex flex-col animate-pulse">
-    <div className="h-44 bg-bg-secondary" />
-    <div className="p-4 flex flex-col gap-3">
-      <div className="h-4 bg-bg-secondary rounded-lg w-3/4" />
-      <div className="h-3 bg-bg-secondary rounded-lg w-full" />
-      <div className="h-3 bg-bg-secondary rounded-lg w-5/6" />
-      <div className="flex gap-2 mt-1">
-        <div className="h-6 w-14 bg-bg-secondary rounded-lg" />
-        <div className="h-6 w-14 bg-bg-secondary rounded-lg" />
-        <div className="h-6 w-14 bg-bg-secondary rounded-lg" />
+  <div className="bg-bg-primary rounded-2xl border border-bg-secondary p-5 flex flex-col gap-4 animate-pulse">
+    <div className="flex justify-between items-start gap-4">
+      <div className="space-y-3 flex-1 pt-1">
+        <div className="h-5 bg-bg-secondary/70 rounded-lg w-full" />
+        <div className="h-5 bg-bg-secondary/70 rounded-lg w-2/3" />
       </div>
+      <div className="w-8 h-8 rounded-full bg-bg-secondary/70 shrink-0" />
+    </div>
+    <div className="flex gap-2 mt-2">
+      <div className="h-6 w-16 bg-bg-secondary/70 rounded-lg" />
+      <div className="h-6 w-16 bg-bg-secondary/70 rounded-lg" />
+      <div className="h-6 w-16 bg-bg-secondary/70 rounded-lg" />
     </div>
   </div>
 );
