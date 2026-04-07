@@ -51,7 +51,8 @@ export const Login: React.FC = () => {
 
   return (
     <div className="h-screen w-full flex overflow-hidden font-sans">
-      {/* ── Left Panel (desktop only) ─────────────────── */}
+
+      {/* ── Left Panel (desktop only) ──────────────────────────────────── */}
       <div className="hidden md:flex w-[42%] lg:w-[38%] bg-bg-sidebar flex-col shrink-0 relative overflow-hidden">
         {/* Logo row */}
         <div className="flex items-center gap-3 px-10 pt-8">
@@ -90,91 +91,107 @@ export const Login: React.FC = () => {
         />
       </div>
 
-      {/* ── Right Panel ───────────────────────────────── */}
-      <div className="flex-1 bg-bg-secondary flex flex-col items-center justify-center p-6 relative overflow-y-auto">
-        {/* Mobile: dark header strip */}
-        <div className="absolute top-0 left-0 w-full h-[35%] bg-bg-sidebar md:hidden rounded-b-[2.5rem] pointer-events-none" />
+      {/* ── Right Panel ────────────────────────────────────────────────── */}
+      <div className="flex-1 flex flex-col overflow-y-auto bg-bg-secondary">
 
-        {/* Mobile branding */}
-        <div className="flex flex-col items-center mb-6 md:hidden relative z-10">
-          <NLogo size="lg" />
-          <p className="mt-3 text-lg font-bold text-text-sidebar-active">Neubite</p>
+        {/* Mobile: branded header block — replaces the awkward absolute strip */}
+        <div className="md:hidden bg-bg-sidebar px-6 pt-12 pb-8 rounded-b-[2rem] shrink-0 relative overflow-hidden">
+          <div className="flex items-center gap-3 mb-5">
+            <NLogo size="md" />
+            <span className="text-xl font-bold text-text-sidebar-active tracking-tight">Neubite</span>
+          </div>
+          <h1 className="text-[1.75rem] font-bold text-text-sidebar-active leading-snug">
+            Meals that{' '}
+            <span className="text-accent-primary">Drive Health.</span>
+          </h1>
+          <p className="mt-2 text-sm text-text-sidebar">Track your pantry. Cook smarter.</p>
+          {/* Subtle glow */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{ backgroundImage: 'radial-gradient(circle at 90% 10%, rgba(209,73,37,0.18) 0%, transparent 60%)' }}
+          />
         </div>
 
-        {/* Form card */}
-        <div className="relative z-10 w-full max-w-[380px] bg-bg-primary rounded-2xl shadow-lg p-8 md:p-10 border border-bg-secondary md:border-transparent md:shadow-none">
-          {isSignUpOpen ? (
-            <SignUpForm onToggleToLogin={() => setIsSignUpOpen(false)} />
-          ) : (
-            <>
-              {/* Header */}
-              <div className="text-center mb-8">
-                <h2 className="text-2xl font-extrabold text-text-primary mb-1.5">Welcome back</h2>
-                <p className="text-sm text-text-secondary">
-                  Don't have an account?{' '}
-                  <button
-                    onClick={() => setIsSignUpOpen(true)}
-                    className="text-accent-primary hover:text-accent-hover font-semibold transition-colors"
-                  >
-                    Sign up now
-                  </button>
-                </p>
-              </div>
+        {/* Form area — scrollable, top-anchored on mobile, centered on desktop */}
+        <div className="flex-1 flex flex-col items-center justify-start md:justify-center px-6 py-8 md:p-6">
+          <div className="w-full max-w-[380px]">
 
-              {/* Form */}
-              <form className="space-y-4" onSubmit={handleSubmit}>
-                {errorText && (
-                  <div className="px-4 py-3 rounded-xl bg-status-error/10 border border-status-error/20 text-sm text-status-error text-center">
-                    {errorText}
+            {/* On mobile: no card wrapper — form sits directly on the warm bg.
+                On desktop: white card matches the original layout. */}
+            <div className="md:bg-bg-primary md:rounded-2xl md:p-10">
+              {isSignUpOpen ? (
+                <SignUpForm onToggleToLogin={() => setIsSignUpOpen(false)} />
+              ) : (
+                <>
+                  {/* Header */}
+                  <div className="text-center mb-8">
+                    <h2 className="text-2xl font-extrabold text-text-primary mb-1.5">Welcome back</h2>
+                    <p className="text-sm text-text-secondary">
+                      Don't have an account?{' '}
+                      <button
+                        onClick={() => setIsSignUpOpen(true)}
+                        className="text-accent-primary hover:text-accent-hover font-semibold transition-colors"
+                      >
+                        Sign up now
+                      </button>
+                    </p>
                   </div>
-                )}
 
-                <div className="space-y-1.5">
-                  <label className="block text-sm font-semibold text-text-primary">
-                    Email <span className="text-status-error">*</span>
-                  </label>
-                  <input
-                    name="email"
-                    type="email"
-                    required
-                    placeholder="you@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-bg-secondary bg-bg-secondary text-base text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-accent-primary/25 focus:border-accent-primary focus:bg-bg-primary transition-all"
-                  />
-                </div>
+                  {/* Form */}
+                  <form className="space-y-4" onSubmit={handleSubmit}>
+                    {errorText && (
+                      <div className="px-4 py-3 rounded-xl bg-status-error/10 border border-status-error/20 text-sm text-status-error text-center">
+                        {errorText}
+                      </div>
+                    )}
 
-                <div className="space-y-1.5">
-                  <label className="block text-sm font-semibold text-text-primary">
-                    Password <span className="text-status-error">*</span>
-                  </label>
-                  <input
-                    name="password"
-                    type="password"
-                    required
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-bg-secondary bg-bg-secondary text-base text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-accent-primary/25 focus:border-accent-primary focus:bg-bg-primary transition-all"
-                  />
-                </div>
+                    <div className="space-y-1.5">
+                      <label className="block text-sm font-semibold text-text-primary">
+                        Email <span className="text-status-error">*</span>
+                      </label>
+                      <input
+                        name="email"
+                        type="email"
+                        required
+                        placeholder="you@example.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="w-full px-4 py-3 rounded-xl border border-bg-secondary bg-bg-primary text-base text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-accent-primary/25 focus:border-accent-primary transition-all"
+                      />
+                    </div>
 
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="w-full mt-2 py-3 rounded-xl text-base font-bold text-white bg-accent-primary hover:bg-accent-hover disabled:opacity-60 transition-colors shadow-sm"
-                >
-                  {isLoading ? 'Signing in…' : 'Sign in'}
-                </button>
-              </form>
-            </>
-          )}
+                    <div className="space-y-1.5">
+                      <label className="block text-sm font-semibold text-text-primary">
+                        Password <span className="text-status-error">*</span>
+                      </label>
+                      <input
+                        name="password"
+                        type="password"
+                        required
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="w-full px-4 py-3 rounded-xl border border-bg-secondary bg-bg-primary text-base text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-accent-primary/25 focus:border-accent-primary transition-all"
+                      />
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={isLoading}
+                      className="w-full mt-2 py-3.5 rounded-xl text-base font-bold text-white bg-accent-primary hover:bg-accent-hover disabled:opacity-60 transition-colors shadow-sm"
+                    >
+                      {isLoading ? 'Signing in…' : 'Sign in'}
+                    </button>
+                  </form>
+                </>
+              )}
+            </div>
+
+            <p className="mt-8 text-xs text-text-secondary opacity-50 text-center">
+              Terms of Service &amp; Privacy Policy
+            </p>
+          </div>
         </div>
-
-        {/* Footer */}
-        <p className="relative z-10 mt-6 text-xs text-text-secondary opacity-50 text-center">
-          Terms of Service &amp; Privacy Policy
-        </p>
       </div>
     </div>
   );

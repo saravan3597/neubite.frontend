@@ -36,6 +36,7 @@ interface GroceryPantryState {
 
   addPantryItem: (item: Omit<PantryItem, 'id'>) => void;
   removePantryItem: (id: string) => void;
+  consumeIngredients: (ingredients: { name: string; quantity: string; inPantry: boolean }[]) => void;
 }
 
 // ── Store ────────────────────────────────────────────────────────────────────
@@ -88,6 +89,37 @@ export const useGroceryPantryStore = create<GroceryPantryState>()(
         set((state) => ({
           pantryItems: state.pantryItems.filter((p) => p.id !== id),
         }));
+      },
+
+      consumeIngredients: (ingredients) => {
+        set((state) => {
+          let updatedPantry = [...state.pantryItems];
+          ingredients.forEach((ing) => {
+            const lowerIng = ing.name.toLowerCase();
+            const hitIndex = updatedPantry.findIndex(p => 
+              p.name.toLowerCase().includes(lowerIng) || lowerIng.includes(p.name.toLowerCase())
+            );
+
+            if (hitIndex > -1) {
+              const item = { ...updatedPantry[hitIndex] };
+              const match = ing.quantity.match(/(\d+)/);
+              
+              if (match) {
+                const amount = parseInt(match[1], 10);
+                item.quantity -= amount;
+              } else {
+                item.quantity -= 1;
+              }
+
+              if (item.quantity <= 0) {
+                updatedPantry.splice(hitIndex, 1);
+              } else {
+                updatedPantry[hitIndex] = item;
+              }
+            }
+          });
+          return { pantryItems: updatedPantry };
+        });
       },
     }),
     { name: 'neubite-grocery-pantry' }

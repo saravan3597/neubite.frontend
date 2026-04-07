@@ -3,22 +3,25 @@ import { useRecipeSuggestions } from '../hooks/useRecipeSuggestions';
 import { useRecipeStore } from '../../../shared/stores/useRecipeStore';
 import { PrepTimeSlider } from './PrepTimeSlider';
 import { RecipeCard } from './RecipeCard';
+import { RecipeModal } from './RecipeModal';
 import { getTimeOfDay, getTimeOfDayLabel } from '../services/recipeAiService';
+import type { Recipe } from '../types/recipe.types';
 
 // ── Loading skeleton ──────────────────────────────────────────────────────────
 
 const RecipeSkeleton = () => (
-  <div className="bg-bg-primary rounded-2xl border border-bg-secondary overflow-hidden flex flex-col animate-pulse">
-    <div className="h-44 bg-bg-secondary" />
-    <div className="p-4 flex flex-col gap-3">
-      <div className="h-4 bg-bg-secondary rounded-lg w-3/4" />
-      <div className="h-3 bg-bg-secondary rounded-lg w-full" />
-      <div className="h-3 bg-bg-secondary rounded-lg w-5/6" />
-      <div className="flex gap-2 mt-1">
-        <div className="h-6 w-14 bg-bg-secondary rounded-lg" />
-        <div className="h-6 w-14 bg-bg-secondary rounded-lg" />
-        <div className="h-6 w-14 bg-bg-secondary rounded-lg" />
+  <div className="bg-bg-primary rounded-2xl border border-bg-secondary p-5 flex flex-col gap-4 animate-pulse">
+    <div className="flex justify-between items-start gap-4">
+      <div className="space-y-3 flex-1 pt-1">
+        <div className="h-5 bg-bg-secondary/70 rounded-lg w-full" />
+        <div className="h-5 bg-bg-secondary/70 rounded-lg w-2/3" />
       </div>
+      <div className="w-8 h-8 rounded-full bg-bg-secondary/70 shrink-0" />
+    </div>
+    <div className="flex gap-2 mt-2">
+      <div className="h-6 w-16 bg-bg-secondary/70 rounded-lg" />
+      <div className="h-6 w-16 bg-bg-secondary/70 rounded-lg" />
+      <div className="h-6 w-16 bg-bg-secondary/70 rounded-lg" />
     </div>
   </div>
 );
@@ -29,6 +32,7 @@ export const RecipeSuggestions: React.FC = () => {
   const { recipes, isLoading, error, maxPrepTime, setMaxPrepTime, refresh } =
     useRecipeSuggestions();
   const { saveRecipe, unsaveRecipe, isSaved } = useRecipeStore();
+  const [selectedRecipe, setSelectedRecipe] = React.useState<Recipe | null>(null);
 
   const tod      = getTimeOfDay();
   const greeting = getTimeOfDayLabel(tod);
@@ -83,30 +87,41 @@ export const RecipeSuggestions: React.FC = () => {
               Try again
             </button>
           </div>
+        ) : recipes.length === 0 && !isLoading ? (
+          <div className="flex flex-col items-center justify-center py-10 text-center">
+            <p className="text-sm font-medium text-text-primary mb-1">No recipes found</p>
+            <p className="text-xs text-text-secondary">Try increasing the max prep time.</p>
+          </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          /* Mobile: horizontal scroll carousel / Desktop: grid */
+          <div className="flex md:grid gap-3 md:gap-4 overflow-x-auto md:overflow-visible snap-x snap-mandatory md:snap-none md:grid-cols-2 lg:grid-cols-3 scrollbar-none pb-2 md:pb-0">
             {isLoading
-              ? [0, 1, 2].map((i) => <RecipeSkeleton key={i} />)
-              : recipes.length === 0
-              ? (
-                <div className="col-span-full flex flex-col items-center justify-center py-10 text-center">
-                  <p className="text-sm font-medium text-text-primary mb-1">No recipes found</p>
-                  <p className="text-xs text-text-secondary">Try increasing the max prep time.</p>
-                </div>
-              )
+              ? [0, 1, 2].map((i) => (
+                  <div key={i} className="w-72 md:w-auto shrink-0 md:shrink snap-start">
+                    <RecipeSkeleton />
+                  </div>
+                ))
               : recipes.map((recipe) => (
-                <RecipeCard
-                  key={recipe.id}
-                  {...recipe}
-                  isSaved={isSaved(recipe.id)}
-                  onSave={saveRecipe}
-                  onUnsave={unsaveRecipe}
-                />
-              ))
+                  <div key={recipe.id} className="w-72 md:w-auto shrink-0 md:shrink snap-start">
+                    <RecipeCard
+                      {...recipe}
+                      isSaved={isSaved(recipe.id)}
+                      onSave={saveRecipe}
+                      onUnsave={unsaveRecipe}
+                      onClick={() => setSelectedRecipe(recipe)}
+                    />
+                  </div>
+                ))
             }
           </div>
         )}
       </div>
+
+      {/* Detail Modal */}
+      <RecipeModal
+        recipe={selectedRecipe}
+        onClose={() => setSelectedRecipe(null)}
+      />
     </div>
   );
 };

@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useRecipeStore } from '../../../shared/stores/useRecipeStore';
 import { RecipeCard } from './RecipeCard';
+import { RecipeModal } from './RecipeModal';
+import type { Recipe } from '../types/recipe.types';
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export const SavedRecipes: React.FC = () => {
   const { savedRecipes, saveRecipe, unsaveRecipe, isSaved } = useRecipeStore();
+  const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
 
   // Auto-expand when recipes are saved; collapse when empty
   const [isExpanded, setIsExpanded] = useState(savedRecipes.length > 0);
@@ -48,7 +51,7 @@ export const SavedRecipes: React.FC = () => {
       {isExpanded && (
         <>
           <div className="border-t border-bg-secondary" />
-          <div className="p-5">
+          <div className="p-3 sm:p-5">
             {savedRecipes.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-8 text-center">
                 <div className="w-10 h-10 bg-bg-secondary rounded-xl flex items-center justify-center mb-3">
@@ -63,21 +66,30 @@ export const SavedRecipes: React.FC = () => {
                 </p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              /* Mobile: horizontal scroll carousel / Desktop: grid */
+              <div className="flex md:grid gap-3 md:gap-4 overflow-x-auto md:overflow-visible snap-x snap-mandatory md:snap-none md:grid-cols-2 lg:grid-cols-3 scrollbar-none pb-2 md:pb-0">
                 {savedRecipes.map((recipe) => (
-                  <RecipeCard
-                    key={recipe.id}
-                    {...recipe}
-                    isSaved={isSaved(recipe.id)}
-                    onSave={saveRecipe}
-                    onUnsave={unsaveRecipe}
-                  />
+                  <div key={recipe.id} className="w-72 md:w-auto shrink-0 md:shrink snap-start">
+                    <RecipeCard
+                      {...recipe}
+                      isSaved={isSaved(recipe.id)}
+                      onSave={saveRecipe}
+                      onUnsave={unsaveRecipe}
+                      onClick={() => setSelectedRecipe(recipe)}
+                    />
+                  </div>
                 ))}
               </div>
             )}
           </div>
         </>
       )}
+
+      {/* Detail Modal */}
+      <RecipeModal
+        recipe={selectedRecipe}
+        onClose={() => setSelectedRecipe(null)}
+      />
     </div>
   );
 };
