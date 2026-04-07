@@ -15,7 +15,7 @@ export const RecipeModal: React.FC<RecipeModalProps> = ({ recipe, onClose }) => 
   useEffect(() => {
     if (recipe) {
       document.body.style.overflow = 'hidden';
-      setShowWarning(false); // reset warning state
+      setShowWarning(false);
     } else {
       document.body.style.overflow = 'unset';
     }
@@ -37,23 +37,31 @@ export const RecipeModal: React.FC<RecipeModalProps> = ({ recipe, onClose }) => 
 
   const handleConfirmPrepared = () => {
     consumeIngredients(recipe.ingredients);
-    // Could add toast here
     onClose();
     setShowWarning(false);
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200" onClick={onClose}>
-      <div 
-        className="bg-bg-primary w-full max-w-lg rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200"
+    /* Backdrop — items-end on mobile (bottom sheet), items-center on desktop */
+    <div
+      className="fixed inset-0 z-50 flex items-end md:items-center justify-center md:p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
+      onClick={onClose}
+    >
+      <div
+        className="bg-bg-primary w-full md:max-w-lg rounded-t-3xl md:rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[92vh] md:max-h-[90vh] animate-in fade-in duration-200"
         onClick={e => e.stopPropagation()}
       >
-        
+
+        {/* Drag handle — mobile only */}
+        <div className="md:hidden flex justify-center pt-3 pb-1 shrink-0">
+          <div className="w-10 h-1 rounded-full bg-bg-secondary" />
+        </div>
+
         {/* Header (hidden if showing warning) */}
         {!showWarning && (
-          <div className="px-6 py-5 border-b border-bg-secondary flex items-start justify-between bg-bg-secondary/20 shrink-0">
+          <div className="px-5 py-4 md:px-6 md:py-5 border-b border-bg-secondary flex items-start justify-between bg-bg-secondary/20 shrink-0">
             <div className="pr-4">
-              <h2 className="text-xl font-bold text-text-primary mb-1.5">{recipe.title}</h2>
+              <h2 className="text-lg md:text-xl font-bold text-text-primary mb-1">{recipe.title}</h2>
               <p className="text-xs text-text-secondary leading-relaxed line-clamp-2">{recipe.description}</p>
             </div>
             <div className="flex items-center gap-2 shrink-0 pt-0.5">
@@ -63,7 +71,7 @@ export const RecipeModal: React.FC<RecipeModalProps> = ({ recipe, onClose }) => 
               >
                 Mark Prepared
               </button>
-              <button 
+              <button
                 onClick={onClose}
                 className="p-1.5 -mr-1 rounded-xl text-text-secondary hover:bg-bg-secondary hover:text-accent-primary transition-colors shrink-0"
               >
@@ -87,24 +95,24 @@ export const RecipeModal: React.FC<RecipeModalProps> = ({ recipe, onClose }) => 
             <p className="text-sm text-text-secondary mb-8 max-w-sm">
               Marking this recipe as prepared will automatically deduct the used ingredients from your pantry tracker. This action cannot be undone.
             </p>
-            
+
             <div className="flex w-full gap-3 mt-auto">
-              <button 
+              <button
                 onClick={() => setShowWarning(false)}
                 className="flex-1 py-3.5 bg-bg-secondary text-text-primary rounded-xl font-bold hover:bg-bg-secondary/70 transition-colors"
-               >
-                 Go Back
-               </button>
-               <button 
+              >
+                Go Back
+              </button>
+              <button
                 onClick={handleConfirmPrepared}
                 className="flex-1 py-3.5 bg-status-warning text-white rounded-xl font-bold hover:bg-status-warning/90 transition-colors shadow-sm"
-               >
-                 Yes, deduct items
-               </button>
+              >
+                Yes, deduct items
+              </button>
             </div>
           </div>
         ) : (
-          <div className="p-6 overflow-y-auto">
+          <div className="p-5 md:p-6 overflow-y-auto">
             {/* Nutrition Summary */}
             <div className="grid grid-cols-3 gap-3 mb-8 shrink-0">
               <div className="bg-accent-primary/10 rounded-xl p-3 text-center border border-accent-primary/20">
@@ -128,7 +136,7 @@ export const RecipeModal: React.FC<RecipeModalProps> = ({ recipe, onClose }) => 
                 ~{recipe.timeToCook} mins
               </span>
             </h3>
-            
+
             <div className="space-y-6">
               {steps.map((step, idx) => (
                 <div key={idx} className="relative flex items-start gap-4">

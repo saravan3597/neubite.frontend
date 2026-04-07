@@ -8,7 +8,7 @@ import { SavedRecipes } from '../features/recipes/components/SavedRecipes';
 // ── Stat card ─────────────────────────────────────────────────────────────────
 
 const StatCard = ({ label, value, sub }: { label: string; value: string | number; sub?: string }) => (
-  <div className="bg-bg-primary rounded-xl border border-bg-secondary p-5">
+  <div className="min-w-[148px] md:min-w-0 shrink-0 md:shrink snap-start bg-bg-primary rounded-xl border border-bg-secondary p-5">
     <p className="text-xs font-semibold text-text-secondary uppercase tracking-wider mb-1">{label}</p>
     <p className="text-2xl font-bold text-text-primary">{value}</p>
     {sub && <p className="text-xs text-text-secondary mt-0.5">{sub}</p>}
@@ -27,8 +27,8 @@ export const Dashboard: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Greeting */}
-      <p className="text-sm text-text-secondary">
+      {/* Greeting — desktop only; mobile already has the time-of-day greeting inside the recipe card */}
+      <p className="hidden md:block text-sm text-text-secondary">
         Welcome back, <span className="font-semibold text-text-primary">{firstName}</span>. Here are your personalised recipe suggestions for today.
       </p>
 
@@ -36,8 +36,8 @@ export const Dashboard: React.FC = () => {
       <RecipeSuggestions />
 
       <div className="border-t border-bg-secondary pt-6 space-y-6">
-        {/* Stats row — 1 col mobile, 3 col sm+ */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {/* Stats row — horizontal scroll on mobile, 3-col grid on md+ */}
+        <div className="flex md:grid md:grid-cols-3 gap-3 md:gap-4 overflow-x-auto md:overflow-visible snap-x snap-mandatory md:snap-none scrollbar-none pb-1 md:pb-0">
           <StatCard
             label="Saved recipes"
             value={savedRecipes.length}
