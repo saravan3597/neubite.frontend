@@ -1,16 +1,41 @@
 @import "tailwindcss";
 
-@theme {
-  --color-brand-50: #eff6ff;
-  --color-brand-100: #dbeafe;
-  --color-brand-500: #3b82f6;
-  --color-brand-600: #2563eb;
-  --color-brand-900: #1e3a8a;
+:root {
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #F9F7F4;
+  --bg-sidebar: #2A3A35;
+  --bg-sidebar-hover: #3B4D47;
   
-  --color-surface-50: #f8fafc;
-  --color-surface-100: #f1f5f9;
-  --color-surface-800: #1e293b;
-  --color-surface-900: #0f172a;
+  --text-primary: #232323;
+  --text-secondary: #686868;
+  --text-sidebar: #A9B8B2;
+  --text-sidebar-active: #FFFFFF;
+  
+  --accent-primary: #D14925;
+  --accent-hover: #A8381A;
+  
+  --status-success: #288754;
+  --status-warning: #D99414;
+  --status-error: #C92A2A;
+}
+
+@theme {
+  --color-bg-primary: var(--bg-primary);
+  --color-bg-secondary: var(--bg-secondary);
+  --color-bg-sidebar: var(--bg-sidebar);
+  --color-bg-sidebar-hover: var(--bg-sidebar-hover);
+  
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-sidebar: var(--text-sidebar);
+  --color-text-sidebar-active: var(--text-sidebar-active);
+  
+  --color-accent-primary: var(--accent-primary);
+  --color-accent-hover: var(--accent-hover);
+  
+  --color-status-success: var(--status-success);
+  --color-status-warning: var(--status-warning);
+  --color-status-error: var(--status-error);
 
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
   
@@ -19,7 +44,7 @@
 }
 
 body {
-  @apply bg-surface-50 text-surface-900 antialiased;
+  @apply bg-bg-primary text-text-primary antialiased;
 }
 
 /* Custom scrollbar for an enterprise feel */
@@ -33,9 +58,10 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-slate-300 rounded-full;
+  background-color: var(--bg-sidebar-hover);
+  border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-slate-400;
+  background-color: var(--bg-sidebar);
 }

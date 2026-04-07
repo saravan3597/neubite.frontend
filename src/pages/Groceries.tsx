@@ -3,7 +3,7 @@ import { GroceryListSection } from '../features/grocery/components/GroceryListSe
 import { PantrySection } from '../features/grocery/components/PantrySection';
 import { useGroceryPantryStore } from '../shared/stores/useGroceryPantryStore';
 
-export const Pantry: React.FC = () => {
+export const Groceries: React.FC = () => {
   const { groceries, pantryItems } = useGroceryPantryStore();
   const unpurchasedCount = groceries.filter((g) => !g.isPurchased).length;
 
@@ -11,7 +11,7 @@ export const Pantry: React.FC = () => {
     <div className="space-y-6">
       {/* Page subtitle */}
       <p className="text-sm text-text-secondary">
-        Manage your grocery list and ingredient inventory in one place.
+        Track what you need to buy and move items straight into your pantry when you get home.
       </p>
 
       {/* Summary pills */}
@@ -32,7 +32,7 @@ export const Pantry: React.FC = () => {
         </div>
       </div>
 
-      {/* Grocery list — collapsed by default, auto-expands when items exist */}
+      {/* Grocery list */}
       <GroceryListSection />
 
       {/* Pantry inventory */}

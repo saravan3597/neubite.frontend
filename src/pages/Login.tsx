@@ -1,9 +1,26 @@
 import React, { useState } from 'react';
 import { useAuthStore } from '../shared/stores/useAuthStore';
 import { useNavigate, Navigate } from 'react-router-dom';
+import { SignUpForm } from '../features/signup';
+
+const NLogo = ({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) => {
+  const sizes = { sm: 'w-8 h-8 text-sm', md: 'w-10 h-10 text-base', lg: 'w-14 h-14 text-2xl' };
+  return (
+    <div className={`${sizes[size]} rounded-xl bg-accent-primary text-white font-extrabold flex items-center justify-center shadow-md shrink-0`}>
+      N
+    </div>
+  );
+};
+
+const CheckIcon = () => (
+  <svg className="w-3.5 h-3.5 text-accent-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+  </svg>
+);
 
 export const Login: React.FC = () => {
-  const [username, setUsername] = useState('');
+  const [isSignUpOpen, setIsSignUpOpen] = useState(false);
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorText, setErrorText] = useState('');
   const { login, isAuthenticated, isLoading } = useAuthStore();
@@ -17,7 +34,7 @@ export const Login: React.FC = () => {
     e.preventDefault();
     setErrorText('');
     try {
-      await login(username, password);
+      await login(email, password);
       navigate('/dashboard');
     } catch (err) {
       console.error(err);
@@ -25,123 +42,139 @@ export const Login: React.FC = () => {
     }
   };
 
+  const features = [
+    'Get a fast pulse on your dietary goals — no digging needed.',
+    'Meal plans grounded in reality, not just optimism.',
+    'Bring groceries, prep, and cooking into one view.',
+    'More visibility, less food waste.',
+  ];
+
   return (
-    <div className="min-h-screen flex bg-surface-50">
-      {/* Left Form Section */}
-      <div className="flex-1 flex flex-col justify-center px-4 sm:px-6 lg:flex-[0_0_480px] lg:px-20 xl:px-24 bg-white border-r border-slate-200 z-10 shadow-2xl relative">
-        <div className="mx-auto w-full max-w-sm lg:w-96">
-          <div className="flex items-center gap-3 mb-10">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-brand-600 flex items-center justify-center text-white font-bold text-xl shadow-md">
-              N
-            </div>
-            <span className="text-2xl font-bold tracking-tight text-surface-900">
-              Neubite
-            </span>
-          </div>
-
-          <div>
-            <h2 className="text-3xl font-extrabold text-surface-900 tracking-tight">
-              Welcome back
-            </h2>
-            <p className="mt-2 text-sm text-slate-500">
-              Sign in to your account to manage your meals.
-            </p>
-          </div>
-
-          <div className="mt-8">
-            <form className="space-y-6" onSubmit={handleSubmit}>
-              {errorText && (
-                <div className="p-3 rounded-lg bg-red-50 border border-red-100 text-sm text-red-600">
-                  {errorText}
-                </div>
-              )}
-              
-              <div className="space-y-1">
-                <label className="block text-sm font-medium text-slate-700">Username</label>
-                <input
-                  name="username"
-                  type="text"
-                  required
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all duration-200 text-surface-900 placeholder-slate-400"
-                  placeholder="Enter your username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                />
-              </div>
-
-              <div className="space-y-1">
-                <div className="flex items-center justify-between">
-                  <label className="block text-sm font-medium text-slate-700">Password</label>
-                  <a href="#" className="text-sm font-medium text-brand-600 hover:text-brand-500 transition-colors">
-                    Forgot password?
-                  </a>
-                </div>
-                <input
-                  name="password"
-                  type="password"
-                  required
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all duration-200 text-surface-900 placeholder-slate-400"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-surface-900 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-surface-900 transition-all duration-200"
-              >
-                Sign in to account
-              </button>
-            </form>
-            
-            <div className="mt-6">
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-slate-200" />
-                </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-white text-slate-500">
-                    New to Neubite?{' '}
-                  </span>
-                </div>
-              </div>
-              <div className="mt-6">
-                <button
-                  type="button"
-                  className="w-full flex justify-center py-3 px-4 rounded-xl shadow-sm bg-white text-sm font-medium text-slate-700 border border-slate-300 hover:bg-slate-50 transition-all duration-200"
-                >
-                  Create an account
-                </button>
-              </div>
-            </div>
-          </div>
+    <div className="h-screen w-full flex overflow-hidden font-sans">
+      {/* ── Left Panel (desktop only) ─────────────────── */}
+      <div className="hidden md:flex w-[42%] lg:w-[38%] bg-bg-sidebar flex-col shrink-0 relative overflow-hidden">
+        {/* Logo row */}
+        <div className="flex items-center gap-3 px-10 pt-8">
+          <NLogo size="sm" />
+          <span className="text-xl font-bold text-text-sidebar-active tracking-tight">Neubite</span>
         </div>
+
+        {/* Centred content */}
+        <div className="flex-1 flex flex-col justify-center px-10 pb-4">
+          <h1 className="text-[2.4rem] font-bold text-text-sidebar-active leading-tight tracking-tight mb-8">
+            Meals that <br />
+            <span className="text-accent-primary">Drive Health.</span>
+          </h1>
+
+          <ul className="space-y-4">
+            {features.map((f, i) => (
+              <li key={i} className="flex items-start gap-3">
+                <div className="mt-0.5 w-5 h-5 rounded-md bg-accent-primary/15 flex items-center justify-center shrink-0">
+                  <CheckIcon />
+                </div>
+                <span className="text-sm text-text-sidebar leading-relaxed">{f}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Footer */}
+        <div className="px-10 pb-8">
+          <p className="text-xs text-text-sidebar opacity-50">© Neubite Ltd. 2026</p>
+        </div>
+
+        {/* Subtle glow */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{ backgroundImage: 'radial-gradient(circle at 85% 15%, rgba(209,73,37,0.14) 0%, transparent 55%)' }}
+        />
       </div>
 
-      {/* Right Image/Gradient Section */}
-      <div className="hidden lg:block relative flex-1 bg-surface-900 overflow-hidden">
-        {/* Abstract decorative elements simulating SaaS background patterns */}
-        <div className="absolute inset-0 bg-gradient-to-br from-brand-900 via-surface-900 to-black opacity-90"></div>
-        
-        {/* Glowing Orb 1 */}
-        <div className="absolute -top-48 -left-48 w-96 h-96 bg-brand-500 rounded-full mix-blend-multiply filter blur-[128px] opacity-70 animate-pulse"></div>
-        {/* Glowing Orb 2 */}
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[40rem] h-[40rem] bg-indigo-500 rounded-full mix-blend-multiply filter blur-[128px] opacity-30"></div>
-        {/* Glowing Orb 3 */}
-        <div className="absolute -bottom-48 -right-48 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-[128px] opacity-50"></div>
+      {/* ── Right Panel ───────────────────────────────── */}
+      <div className="flex-1 bg-bg-secondary flex flex-col items-center justify-center p-6 relative overflow-y-auto">
+        {/* Mobile: dark header strip */}
+        <div className="absolute top-0 left-0 w-full h-[35%] bg-bg-sidebar md:hidden rounded-b-[2.5rem] pointer-events-none" />
 
-        <div className="relative h-full flex flex-col justify-center px-16 xl:px-24">
-          <blockquote className="max-w-2xl">
-            <p className="text-3xl font-medium text-white leading-tight mb-6">
-              "Neubite completely changed how I manage my groceries. I am saving money on meals and reducing my food waste to near zero."
-            </p>
-            <footer className="text-lg text-brand-100 font-medium">
-              — Sarah Jenkins
-              <div className="text-sm text-slate-400 font-normal mt-1">Product Designer</div>
-            </footer>
-          </blockquote>
+        {/* Mobile branding */}
+        <div className="flex flex-col items-center mb-6 md:hidden relative z-10">
+          <NLogo size="lg" />
+          <p className="mt-3 text-lg font-bold text-text-sidebar-active">Neubite</p>
         </div>
+
+        {/* Form card */}
+        <div className="relative z-10 w-full max-w-[380px] bg-bg-primary rounded-2xl shadow-lg p-8 md:p-10 border border-bg-secondary md:border-transparent md:shadow-none">
+          {isSignUpOpen ? (
+            <SignUpForm onToggleToLogin={() => setIsSignUpOpen(false)} />
+          ) : (
+            <>
+              {/* Header */}
+              <div className="text-center mb-8">
+                <h2 className="text-2xl font-extrabold text-text-primary mb-1.5">Welcome back</h2>
+                <p className="text-sm text-text-secondary">
+                  Don't have an account?{' '}
+                  <button
+                    onClick={() => setIsSignUpOpen(true)}
+                    className="text-accent-primary hover:text-accent-hover font-semibold transition-colors"
+                  >
+                    Sign up now
+                  </button>
+                </p>
+              </div>
+
+              {/* Form */}
+              <form className="space-y-4" onSubmit={handleSubmit}>
+                {errorText && (
+                  <div className="px-4 py-3 rounded-xl bg-status-error/10 border border-status-error/20 text-sm text-status-error text-center">
+                    {errorText}
+                  </div>
+                )}
+
+                <div className="space-y-1.5">
+                  <label className="block text-sm font-semibold text-text-primary">
+                    Email <span className="text-status-error">*</span>
+                  </label>
+                  <input
+                    name="email"
+                    type="email"
+                    required
+                    placeholder="you@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl border border-bg-secondary bg-bg-secondary text-base text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-accent-primary/25 focus:border-accent-primary focus:bg-bg-primary transition-all"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="block text-sm font-semibold text-text-primary">
+                    Password <span className="text-status-error">*</span>
+                  </label>
+                  <input
+                    name="password"
+                    type="password"
+                    required
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl border border-bg-secondary bg-bg-secondary text-base text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-accent-primary/25 focus:border-accent-primary focus:bg-bg-primary transition-all"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full mt-2 py-3 rounded-xl text-base font-bold text-white bg-accent-primary hover:bg-accent-hover disabled:opacity-60 transition-colors shadow-sm"
+                >
+                  {isLoading ? 'Signing in…' : 'Sign in'}
+                </button>
+              </form>
+            </>
+          )}
+        </div>
+
+        {/* Footer */}
+        <p className="relative z-10 mt-6 text-xs text-text-secondary opacity-50 text-center">
+          Terms of Service &amp; Privacy Policy
+        </p>
       </div>
     </div>
   );

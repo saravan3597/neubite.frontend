@@ -1,59 +1,61 @@
 import React from 'react';
-import { RecipeCard } from '../features/recipes/components/RecipeCard';
+import { useAuthStore } from '../shared/stores/useAuthStore';
+import { useGroceryPantryStore } from '../shared/stores/useGroceryPantryStore';
+import { useRecipeStore } from '../shared/stores/useRecipeStore';
+import { RecipeSuggestions } from '../features/recipes/components/RecipeSuggestions';
+import { SavedRecipes } from '../features/recipes/components/SavedRecipes';
+
+// ── Stat card ─────────────────────────────────────────────────────────────────
+
+const StatCard = ({ label, value, sub }: { label: string; value: string | number; sub?: string }) => (
+  <div className="bg-bg-primary rounded-xl border border-bg-secondary p-5">
+    <p className="text-xs font-semibold text-text-secondary uppercase tracking-wider mb-1">{label}</p>
+    <p className="text-2xl font-bold text-text-primary">{value}</p>
+    {sub && <p className="text-xs text-text-secondary mt-0.5">{sub}</p>}
+  </div>
+);
+
+// ── Page ──────────────────────────────────────────────────────────────────────
 
 export const Dashboard: React.FC = () => {
+  const { user }                   = useAuthStore();
+  const { pantryItems, groceries } = useGroceryPantryStore();
+  const { savedRecipes }           = useRecipeStore();
 
-  const mockRecipes = [
-    {
-      id: '1',
-      title: 'Healthy Chicken Salad',
-      matchedIngredients: [{ id: '1', name: 'Chicken Breast' }, { id: '2', name: 'Lettuce' }],
-      missingIngredients: [{ id: '3', name: 'Olive Oil' }],
-      nutritionalData: { calories: 350, protein: 40, carbs: 10, fat: 15 },
-      timeToCook: '15 mins'
-    },
-    {
-      id: '2',
-      title: 'Beef Stir Fry',
-      matchedIngredients: [{ id: '4', name: 'Beef' }],
-      missingIngredients: [{ id: '5', name: 'Broccoli' }, { id: '6', name: 'Soy Sauce' }],
-      nutritionalData: { calories: 500, protein: 45, carbs: 20, fat: 25 },
-      timeToCook: '25 mins'
-    },
-    {
-      id: '3',
-      title: 'Avocado Toast & Egg',
-      matchedIngredients: [{ id: '7', name: 'Bread' }, { id: '8', name: 'Eggs' }],
-      missingIngredients: [{ id: '9', name: 'Avocado' }],
-      nutritionalData: { calories: 420, protein: 18, carbs: 32, fat: 22 },
-      timeToCook: '10 mins'
-    }
-  ];
+  const firstName        = user?.name?.split(' ')[0] || user?.email?.split('@')[0] || 'there';
+  const unpurchasedCount = groceries.filter((g) => !g.isPurchased).length;
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight text-surface-900">Dashboard</h1>
-        <p className="mt-2 text-sm text-slate-500">
-          Welcome back! Here are your personalized recipe suggestions for today.
-        </p>
+    <div className="space-y-6">
+      {/* Greeting */}
+      <p className="text-sm text-text-secondary">
+        Welcome back, <span className="font-semibold text-text-primary">{firstName}</span>. Here are your personalised recipe suggestions for today.
+      </p>
+
+      {/* Stats row — 1 col mobile, 3 col sm+ */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <StatCard
+          label="Saved recipes"
+          value={savedRecipes.length}
+          sub={savedRecipes.length === 0 ? 'Favourite a recipe below' : 'recipes saved'}
+        />
+        <StatCard
+          label="Pantry items"
+          value={pantryItems.length}
+          sub={pantryItems.length === 0 ? 'Add via Pantry page' : 'ingredients tracked'}
+        />
+        <StatCard
+          label="To buy"
+          value={unpurchasedCount}
+          sub={unpurchasedCount === 0 ? 'List is clear' : 'on grocery list'}
+        />
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-        <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-surface-50">
-          <h2 className="text-lg font-semibold text-surface-900">Suggested Recipes</h2>
-          <button className="text-sm font-medium text-brand-600 hover:text-brand-700 transition-colors">
-            View all
-          </button>
-        </div>
-        <div className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {mockRecipes.map((recipe) => (
-              <RecipeCard key={recipe.id} {...recipe} />
-            ))}
-          </div>
-        </div>
-      </div>
+      {/* AI recipe suggestions */}
+      <RecipeSuggestions />
+
+      {/* Saved / favourited recipes */}
+      <SavedRecipes />
     </div>
   );
 };
