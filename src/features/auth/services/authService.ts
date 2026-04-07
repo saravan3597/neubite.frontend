@@ -1,8 +1,19 @@
-import { signUp, confirmSignUp, signIn, signOut, fetchUserAttributes as fetchAmplifyUserAttributes, fetchAuthSession } from 'aws-amplify/auth';
+import {
+  signUp,
+  confirmSignUp,
+  signIn,
+  signOut,
+  fetchUserAttributes as fetchAmplifyUserAttributes,
+  fetchAuthSession,
+} from "aws-amplify/auth";
 
-export const handleSignUp = async (email: string, password: string, name: string) => {
+export const handleSignUp = async (
+  email: string,
+  password: string,
+  name: string,
+) => {
   try {
-    const { isSignUpComplete, userId, nextStep } = await signUp({
+    const { nextStep } = await signUp({
       username: email,
       password,
       options: {
@@ -10,24 +21,24 @@ export const handleSignUp = async (email: string, password: string, name: string
           email,
           name,
         },
-      }
+      },
     });
     return { success: true, nextStep };
   } catch (error) {
-    console.error('Error signing up:', error);
+    console.error("Error signing up:", error);
     throw error;
   }
 };
 
 export const handleConfirmSignUp = async (email: string, code: string) => {
   try {
-    const { isSignUpComplete, nextStep } = await confirmSignUp({
+    const { isSignUpComplete } = await confirmSignUp({
       username: email,
-      confirmationCode: code
+      confirmationCode: code,
     });
     return { success: true, isSignUpComplete };
   } catch (error) {
-    console.error('Error confirming sign up:', error);
+    console.error("Error confirming sign up:", error);
     throw error;
   }
 };
@@ -36,11 +47,11 @@ export const handleSignIn = async (email: string, password: string) => {
   try {
     const { isSignedIn, nextStep } = await signIn({
       username: email,
-      password
+      password,
     });
     return { success: true, isSignedIn, nextStep };
   } catch (error) {
-    console.error('Error signing in:', error);
+    console.error("Error signing in:", error);
     throw error;
   }
 };
@@ -49,7 +60,7 @@ export const fetchUserAttributes = async () => {
   try {
     return await fetchAmplifyUserAttributes();
   } catch (error) {
-    console.error('Error fetching user attributes:', error);
+    console.error("Error fetching user attributes:", error);
     throw error;
   }
 };
@@ -68,7 +79,7 @@ export const handleSignOut = async () => {
     await signOut();
     return { success: true };
   } catch (error) {
-    console.error('Error signing out:', error);
+    console.error("Error signing out:", error);
     throw error;
   }
 };
