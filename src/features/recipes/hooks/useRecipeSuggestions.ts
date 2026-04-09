@@ -18,6 +18,7 @@ export const PREP_TIME_DEFAULT = 60;
 interface UseRecipeSuggestionsReturn {
   recipes: Recipe[];
   isLoading: boolean;
+  isPantryEmpty: boolean;
   error: string | null;
   maxPrepTime: number;
   setMaxPrepTime: (minutes: number) => void;
@@ -28,13 +29,15 @@ export const useRecipeSuggestions = (): UseRecipeSuggestionsReturn => {
   const { pantryItems } = useGroceryPantryStore();
 
   const [recipes,     setRecipes]     = useState<Recipe[]>([]);
-  const [isLoading,   setIsLoading]   = useState(true);
+  const [isLoading,   setIsLoading]   = useState(false);
   const [error,       setError]       = useState<string | null>(null);
   const [maxPrepTime, setMaxPrepTime] = useState(PREP_TIME_DEFAULT);
 
-  const pantryIngredients = pantryItems.map((p) => p.name);
+  const pantryIngredients = pantryItems.map((p) => ({ name: p.name, quantity: p.quantity, unit: p.unit }));
+  const isPantryEmpty = pantryIngredients.length === 0;
 
   const load = useCallback(async () => {
+    if (isPantryEmpty) return;
     setIsLoading(true);
     setError(null);
     try {
@@ -52,11 +55,11 @@ export const useRecipeSuggestions = (): UseRecipeSuggestionsReturn => {
     }
   // pantryIngredients is a new array each render, stringify for stable dep
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [maxPrepTime, JSON.stringify(pantryIngredients)]);
+  }, [isPantryEmpty, maxPrepTime, JSON.stringify(pantryIngredients)]);
 
   useEffect(() => {
     load();
   }, [load]);
 
-  return { recipes, isLoading, error, maxPrepTime, setMaxPrepTime, refresh: load };
+  return { recipes, isLoading, isPantryEmpty, error, maxPrepTime, setMaxPrepTime, refresh: load };
 };

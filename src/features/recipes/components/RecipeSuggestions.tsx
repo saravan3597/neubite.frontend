@@ -29,7 +29,7 @@ const RecipeSkeleton = () => (
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export const RecipeSuggestions: React.FC = () => {
-  const { recipes, isLoading, error, maxPrepTime, setMaxPrepTime, refresh } =
+  const { recipes, isLoading, isPantryEmpty, error, maxPrepTime, setMaxPrepTime, refresh } =
     useRecipeSuggestions();
   const { saveRecipe, unsaveRecipe, isSaved } = useRecipeStore();
   const [selectedRecipe, setSelectedRecipe] = React.useState<Recipe | null>(null);
@@ -48,30 +48,47 @@ export const RecipeSuggestions: React.FC = () => {
               Here's what you can make right now based on your pantry.
             </p>
           </div>
-          <button
-            id="recipe-refresh-btn"
-            onClick={refresh}
-            disabled={isLoading}
-            className="shrink-0 p-2 rounded-xl border border-bg-secondary text-text-secondary hover:border-accent-primary/40 hover:text-accent-primary disabled:opacity-40 transition-all"
-            title="Refresh suggestions"
-          >
-            <svg
-              className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`}
-              fill="none" stroke="currentColor" viewBox="0 0 24 24"
+          {!isPantryEmpty && (
+            <button
+              id="recipe-refresh-btn"
+              onClick={refresh}
+              disabled={isLoading}
+              className="shrink-0 p-2 rounded-xl border border-bg-secondary text-text-secondary hover:border-accent-primary/40 hover:text-accent-primary disabled:opacity-40 transition-all"
+              title="Refresh suggestions"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-            </svg>
-          </button>
+              <svg
+                className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`}
+                fill="none" stroke="currentColor" viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            </button>
+          )}
         </div>
 
         {/* Prep time selector */}
-        <PrepTimeSlider value={maxPrepTime} onChange={setMaxPrepTime} />
+        {!isPantryEmpty && <PrepTimeSlider value={maxPrepTime} onChange={setMaxPrepTime} />}
       </div>
 
       {/* ── Content ── */}
       <div className="p-3 sm:p-5">
-        {error ? (
+        {isPantryEmpty ? (
+          <div className="flex flex-col items-center justify-center py-12 text-center gap-3">
+            <div className="w-12 h-12 bg-bg-secondary rounded-2xl flex items-center justify-center">
+              <svg className="w-6 h-6 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+                  d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-text-primary">Your pantry is empty</p>
+              <p className="text-xs text-text-secondary mt-1 max-w-[220px]">
+                Add some ingredients to your pantry and we'll suggest recipes you can make right now.
+              </p>
+            </div>
+          </div>
+        ) : error ? (
           <div className="flex flex-col items-center justify-center py-10 text-center gap-3">
             <div className="w-10 h-10 bg-status-error/10 rounded-xl flex items-center justify-center">
               <svg className="w-5 h-5 text-status-error" fill="none" stroke="currentColor" viewBox="0 0 24 24">

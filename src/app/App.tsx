@@ -2,11 +2,15 @@ import React, { useEffect } from 'react';
 import { RouterProvider } from 'react-router-dom';
 import { router } from './router';
 import { useAuthStore } from '../shared/stores/useAuthStore';
+import { useGroceryPantryStore } from '../shared/stores/useGroceryPantryStore';
+import { useRecipeStore } from '../shared/stores/useRecipeStore';
 import { Amplify } from 'aws-amplify';
 
 
 export const App: React.FC = () => {
   const { checkSession, isLoading } = useAuthStore();
+  const loadPantryAndGrocery = useGroceryPantryStore((s) => s.loadFromServer);
+  const loadSavedRecipes = useRecipeStore((s) => s.loadFromServer);
 
   Amplify.configure({
     Auth: {
@@ -19,7 +23,9 @@ export const App: React.FC = () => {
 
   useEffect(() => {
     checkSession();
-  }, [checkSession]);
+    loadPantryAndGrocery();
+    loadSavedRecipes();
+  }, [checkSession, loadPantryAndGrocery, loadSavedRecipes]);
 
   if (isLoading) {
     return (

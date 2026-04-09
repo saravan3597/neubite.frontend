@@ -2,6 +2,7 @@ import axiosClient from '../../../shared/api/axiosClient';
 import type {
   Recipe,
   RecipeSuggestionParams,
+  PantryIngredient,
   TimeOfDay,
   AiRecipeResponse,
 } from '../types/recipe.types';
@@ -35,7 +36,7 @@ export const buildRecipePrompt = (params: RecipeSuggestionParams): string => {
   const { timeOfDay, maxPrepTime, pantryIngredients } = params;
   const pantryList =
     pantryIngredients.length > 0
-      ? pantryIngredients.join(', ')
+      ? pantryIngredients.map((p) => `${p.name} (${p.quantity} ${p.unit})`).join(', ')
       : 'no specific ingredients (suggest anything suitable)';
 
   return `
@@ -74,14 +75,15 @@ Respond with a valid JSON object matching this schema:
 // ── Cross-reference pantry ────────────────────────────────────────────────────
 // Marks ingredients as inPantry if their name matches pantry items (case-insensitive).
 
-const enrichWithPantry = (recipes: Recipe[], pantryIngredients: string[]): Recipe[] => {
-  const lower = pantryIngredients.map((n) => n.toLowerCase());
+const enrichWithPantry = (recipes: Recipe[], pantryIngredients: PantryIngredient[]): Recipe[] => {
   return recipes.map((recipe) => ({
     ...recipe,
-    ingredients: recipe.ingredients.map((ing) => ({
-      ...ing,
-      inPantry: lower.some((p) => ing.name.toLowerCase().includes(p) || p.includes(ing.name.toLowerCase())),
-    })),
+    ingredients: recipe.ingredients.map((ing) => {
+      const match = pantryIngredients.find(
+        (p) => ing.name.toLowerCase().includes(p.name.toLowerCase()) || p.name.toLowerCase().includes(ing.name.toLowerCase())
+      );
+      return { ...ing, inPantry: !!match };
+    }),
   }));
 };
 
@@ -120,10 +122,9 @@ export const fetchRecipeSuggestions = async (
   // ── REAL API PATH ─────────────────────────────────────────────────────────
   if (aiApiUrl) {
     try {
-      const prompt = buildRecipePrompt(params);
       const response = await axiosClient.post<AiRecipeResponse>(
-        `${aiApiUrl}/recipe-suggestions`,
-        { prompt, params }
+        `${aiApiUrl}/recipes/suggestions`,
+        params,
       );
       return enrichWithPantry(response.data.recipes, params.pantryIngredients);
     } catch (error) {

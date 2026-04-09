@@ -5,16 +5,18 @@ import type { PantryUnit } from '../../../shared/stores/useGroceryPantryStore';
 
 interface IntakeModalProps {
   itemName: string;
+  initialValues?: { quantity: number; unit: PantryUnit; expiryDate: string };
   onSave: (details: { quantity: number; unit: PantryUnit; expiryDate: string }) => void;
   onCancel: () => void;
 }
 
 // ── Component ────────────────────────────────────────────────────────────────
 
-export const IntakeModal: React.FC<IntakeModalProps> = ({ itemName, onSave, onCancel }) => {
-  const [quantity, setQuantity] = useState<string>('');
-  const [unit, setUnit] = useState<PantryUnit>('kgs');
-  const [expiryDate, setExpiryDate] = useState<string>('');
+export const IntakeModal: React.FC<IntakeModalProps> = ({ itemName, initialValues, onSave, onCancel }) => {
+  const isEditing = !!initialValues;
+  const [quantity, setQuantity] = useState<string>(initialValues ? String(initialValues.quantity) : '');
+  const [unit, setUnit] = useState<PantryUnit>(initialValues?.unit ?? 'kgs');
+  const [expiryDate, setExpiryDate] = useState<string>(initialValues?.expiryDate ?? '');
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const validate = (): boolean => {
@@ -43,7 +45,7 @@ export const IntakeModal: React.FC<IntakeModalProps> = ({ itemName, onSave, onCa
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs font-medium text-text-sidebar uppercase tracking-wider mb-0.5">
-                Moving to Pantry
+                {isEditing ? 'Edit Pantry Item' : 'Moving to Pantry'}
               </p>
               <h2 className="text-base font-bold text-text-sidebar-active truncate">{itemName}</h2>
             </div>
@@ -135,7 +137,7 @@ export const IntakeModal: React.FC<IntakeModalProps> = ({ itemName, onSave, onCa
             onClick={handleSave}
             className="flex-1 px-4 py-2.5 rounded-xl bg-accent-primary hover:bg-accent-hover text-white text-sm font-semibold transition-colors shadow-sm"
           >
-            Save to Pantry
+            {isEditing ? 'Save Changes' : 'Save to Pantry'}
           </button>
         </div>
       </div>
