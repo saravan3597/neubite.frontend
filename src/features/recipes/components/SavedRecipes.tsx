@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useRecipeStore } from '../../../shared/stores/useRecipeStore';
 import { RecipeCard } from './RecipeCard';
 import { RecipeModal } from './RecipeModal';
@@ -10,12 +10,7 @@ export const SavedRecipes: React.FC = () => {
   const { savedRecipes, saveRecipe, unsaveRecipe, isSaved } = useRecipeStore();
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
 
-  // Auto-expand when recipes are saved; collapse when empty
   const [isExpanded, setIsExpanded] = useState(savedRecipes.length > 0);
-
-  useEffect(() => {
-    setIsExpanded(savedRecipes.length > 0);
-  }, [savedRecipes.length]);
 
   return (
     <div className="bg-bg-primary rounded-2xl border border-bg-secondary overflow-hidden">

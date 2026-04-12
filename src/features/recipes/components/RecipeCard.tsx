@@ -39,7 +39,7 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({
 
   const handleSaveClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    isSaved ? onUnsave(id) : onSave(recipe);
+    if (isSaved) onUnsave(id); else onSave(recipe);
   };
 
   return (

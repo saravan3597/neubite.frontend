@@ -159,7 +159,7 @@ export const PantrySection: React.FC = () => {
               value={newItemName}
               onChange={(e) => setNewItemName(e.target.value)}
               placeholder="Add directly to pantry..."
-              className="flex-1 sm:w-48 px-3 py-2 text-sm bg-bg-secondary border-none rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-primary text-text-primary placeholder:text-text-secondary"
+              className="flex-1 sm:w-48 px-3 py-2 text-base bg-bg-secondary border-none rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-primary/30 text-text-primary placeholder:text-text-secondary"
             />
             <button
               type="submit"

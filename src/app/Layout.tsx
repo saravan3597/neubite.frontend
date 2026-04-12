@@ -145,7 +145,80 @@ const ProfileSheet = ({ displayName, email, initials, onSignOut, onClose }: Prof
       </div>
 
       {/* Safe-area spacer */}
-      <div className="h-4" />
+      <div style={{ height: 'max(1rem, env(safe-area-inset-bottom))' }} />
+    </div>
+  </div>
+);
+
+// ── Sidebar content ─────────────────────────────────────────────────────
+interface SidebarContentProps {
+  collapsed: boolean;
+  initials: string;
+  displayName: string;
+  email: string;
+  onLogoutClick: () => void;
+}
+
+const SidebarContent: React.FC<SidebarContentProps> = ({ collapsed, initials, displayName, email, onLogoutClick }) => (
+  <div className="flex flex-col h-full">
+    {/* Logo */}
+    <div className={`flex items-center h-14 border-b border-bg-sidebar-hover shrink-0 ${collapsed ? 'justify-center px-0' : 'gap-3 px-5'}`}>
+      <div className="w-8 h-8 rounded-lg bg-accent-primary text-white font-extrabold text-sm flex items-center justify-center shrink-0">
+        N
+      </div>
+      {!collapsed && (
+        <span className="text-base font-bold text-text-sidebar-active tracking-tight">Neubite</span>
+      )}
+    </div>
+
+    {/* Nav */}
+    <nav className="flex-1 px-3 py-5 space-y-0.5 overflow-y-auto">
+      {navLinks.map(({ name, to, icon: Icon }) => (
+        <NavLink
+          key={name}
+          to={to}
+          className={({ isActive }) =>
+            `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors duration-100 ${
+              isActive
+                ? 'bg-accent-primary text-white'
+                : 'text-text-sidebar hover:bg-bg-sidebar-hover hover:text-text-sidebar-active'
+            } ${collapsed ? 'justify-center' : ''}`
+          }
+          title={collapsed ? name : undefined}
+        >
+          {({ isActive }) => (
+            <>
+              <span className="shrink-0"><Icon active={isActive} /></span>
+              {!collapsed && <span>{name}</span>}
+            </>
+          )}
+        </NavLink>
+      ))}
+    </nav>
+
+    {/* User + logout */}
+    <div className="px-3 pb-4 pt-3 border-t border-bg-sidebar-hover space-y-1 shrink-0">
+      {collapsed ? (
+        <div className="flex justify-center py-1">
+          <Avatar initials={initials} size="md" />
+        </div>
+      ) : (
+        <div className="flex items-center gap-3 px-3 py-2.5">
+          <Avatar initials={initials} size="md" />
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-text-sidebar-active truncate">{displayName}</p>
+            <p className="text-xs text-text-sidebar truncate">{email}</p>
+          </div>
+        </div>
+      )}
+      <button
+        onClick={onLogoutClick}
+        className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium text-text-sidebar hover:text-status-error hover:bg-bg-sidebar-hover transition-colors ${collapsed ? 'justify-center' : ''}`}
+        title="Sign out"
+      >
+        <LogoutIcon />
+        {!collapsed && <span>Sign out</span>}
+      </button>
     </div>
   </div>
 );
@@ -168,77 +241,18 @@ export const Layout: React.FC = () => {
     logout();
   };
 
-  // ── Sidebar inner content ───────────────────────────────────────────
-  const SidebarContent = () => (
-    <div className="flex flex-col h-full">
-      {/* Logo */}
-      <div className={`flex items-center h-14 border-b border-bg-sidebar-hover shrink-0 ${collapsed ? 'justify-center px-0' : 'gap-3 px-5'}`}>
-        <div className="w-8 h-8 rounded-lg bg-accent-primary text-white font-extrabold text-sm flex items-center justify-center shrink-0">
-          N
-        </div>
-        {!collapsed && (
-          <span className="text-base font-bold text-text-sidebar-active tracking-tight">Neubite</span>
-        )}
-      </div>
-
-      {/* Nav */}
-      <nav className="flex-1 px-3 py-5 space-y-0.5 overflow-y-auto">
-        {navLinks.map(({ name, to, icon: Icon }) => (
-          <NavLink
-            key={name}
-            to={to}
-            className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors duration-100 ${
-                isActive
-                  ? 'bg-accent-primary text-white'
-                  : 'text-text-sidebar hover:bg-bg-sidebar-hover hover:text-text-sidebar-active'
-              } ${collapsed ? 'justify-center' : ''}`
-            }
-            title={collapsed ? name : undefined}
-          >
-            {({ isActive }) => (
-              <>
-                <span className="shrink-0"><Icon active={isActive} /></span>
-                {!collapsed && <span>{name}</span>}
-              </>
-            )}
-          </NavLink>
-        ))}
-      </nav>
-
-      {/* User + logout */}
-      <div className="px-3 pb-4 pt-3 border-t border-bg-sidebar-hover space-y-1 shrink-0">
-        {collapsed ? (
-          <div className="flex justify-center py-1">
-            <Avatar initials={initials} size="md" />
-          </div>
-        ) : (
-          <div className="flex items-center gap-3 px-3 py-2.5">
-            <Avatar initials={initials} size="md" />
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-text-sidebar-active truncate">{displayName}</p>
-              <p className="text-xs text-text-sidebar truncate">{user?.email ?? ''}</p>
-            </div>
-          </div>
-        )}
-        <button
-          onClick={() => setShowLogoutConfirm(true)}
-          className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium text-text-sidebar hover:text-status-error hover:bg-bg-sidebar-hover transition-colors ${collapsed ? 'justify-center' : ''}`}
-          title="Sign out"
-        >
-          <LogoutIcon />
-          {!collapsed && <span>Sign out</span>}
-        </button>
-      </div>
-    </div>
-  );
-
   return (
     <div className="h-screen w-full flex overflow-hidden bg-bg-secondary">
 
       {/* Desktop sidebar */}
       <aside className={`hidden md:flex flex-col bg-bg-sidebar shrink-0 relative transition-all duration-300 ${collapsed ? 'w-[4.5rem]' : 'w-60'}`}>
-        <SidebarContent />
+        <SidebarContent
+          collapsed={collapsed}
+          initials={initials}
+          displayName={displayName}
+          email={user?.email ?? ''}
+          onLogoutClick={() => setShowLogoutConfirm(true)}
+        />
         {/* Collapse toggle */}
         <button
           onClick={() => setCollapsed(!collapsed)}
@@ -252,7 +266,10 @@ export const Layout: React.FC = () => {
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
 
         {/* ── Top header ── */}
-        <header className="h-14 bg-bg-primary border-b border-bg-secondary flex items-center px-4 md:px-6 shrink-0">
+        <header className="bg-bg-primary border-b border-bg-secondary shrink-0">
+          {/* Safe-area spacer — sits behind the status bar / Dynamic Island */}
+          <div className="md:hidden" style={{ height: 'max(env(safe-area-inset-top), 50px)' }} />
+          <div className="flex items-center h-14 px-4 md:px-6">
           {/* Mobile: logo mark + page title */}
           <div className="flex-1 flex items-center gap-2.5 md:hidden">
             <div className="w-7 h-7 rounded-md bg-accent-primary text-white font-extrabold text-xs flex items-center justify-center shrink-0">N</div>
@@ -264,10 +281,14 @@ export const Layout: React.FC = () => {
           <div className="md:hidden">
             <Avatar initials={initials} size="sm" />
           </div>
+          </div>
         </header>
 
         {/* ── Page content ── */}
-        <main className="flex-1 overflow-y-auto px-3 pt-3 pb-24 sm:px-4 sm:pt-4 md:p-6 lg:p-8">
+        <main
+          className="flex-1 overflow-y-auto px-3 pt-3 sm:px-4 sm:pt-4 md:p-6 lg:p-8"
+          style={{ paddingBottom: 'calc(6rem + env(safe-area-inset-bottom))' }}
+        >
           <div className="max-w-5xl mx-auto">
             <Outlet />
           </div>
@@ -275,7 +296,10 @@ export const Layout: React.FC = () => {
       </div>
 
       {/* ── Mobile bottom tab bar ── */}
-      <nav className="md:hidden fixed bottom-0 inset-x-0 z-30 bg-bg-primary border-t border-bg-secondary">
+      <nav
+        className="md:hidden fixed bottom-0 inset-x-0 z-30 bg-bg-primary border-t border-bg-secondary"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+      >
         <div className="flex h-16">
           {navLinks.map(({ name, to, icon: Icon }) => (
             <NavLink

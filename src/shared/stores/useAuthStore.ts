@@ -5,7 +5,7 @@ interface User {
   email?: string;
   name?: string;
   username?: string;
-  [key: string]: any;
+  [key: string]: string | undefined;
 }
 
 interface AuthState {
@@ -30,12 +30,12 @@ export const useAuthStore = create<AuthState>((set) => ({
     try {
       set({ isLoading: true });
       const { success, isSignedIn } = await handleSignIn(email, password);
-      
+
       if (success && isSignedIn) {
-        const userDetails = await fetchUserAttributes();
-        set({ isAuthenticated: true, isLoading: false, user: userDetails });
+        const [userDetails, session] = await Promise.all([fetchUserAttributes(), getUserSession()]);
+        const token = session?.tokens?.idToken?.toString() ?? null;
+        set({ isAuthenticated: true, isLoading: false, user: userDetails, token });
       } else {
-        // Here you would handle MFA or required password resets via nextStep
         set({ isAuthenticated: false, isLoading: false });
       }
     } catch (error) {
@@ -54,13 +54,14 @@ export const useAuthStore = create<AuthState>((set) => ({
       set({ isLoading: true });
       const session = await getUserSession();
       if (session) {
-        const userDetails = await fetchUserAttributes();
-        set({ isAuthenticated: true, isLoading: false, user: userDetails });
+        const [userDetails] = await Promise.all([fetchUserAttributes()]);
+        const token = session.tokens?.idToken?.toString() ?? null;
+        set({ isAuthenticated: true, isLoading: false, user: userDetails, token });
       } else {
-        set({ isAuthenticated: false, isLoading: false, user: null });
+        set({ isAuthenticated: false, isLoading: false, user: null, token: null });
       }
-    } catch (error) {
-      set({ isAuthenticated: false, isLoading: false, user: null });
+    } catch {
+      set({ isAuthenticated: false, isLoading: false, user: null, token: null });
     }
   }
 }));

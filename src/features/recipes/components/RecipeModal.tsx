@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import type { Recipe } from '../types/recipe.types';
 import { useGroceryPantryStore } from '../../../shared/stores/useGroceryPantryStore';
 
@@ -13,15 +14,8 @@ export const RecipeModal: React.FC<RecipeModalProps> = ({ recipe, onClose }) => 
 
   // Prevent body scroll when modal is open
   useEffect(() => {
-    if (recipe) {
-      document.body.style.overflow = 'hidden';
-      setShowWarning(false);
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
+    document.body.style.overflow = recipe ? 'hidden' : 'unset';
+    return () => { document.body.style.overflow = 'unset'; };
   }, [recipe]);
 
   if (!recipe) return null;
@@ -41,7 +35,7 @@ export const RecipeModal: React.FC<RecipeModalProps> = ({ recipe, onClose }) => 
     setShowWarning(false);
   };
 
-  return (
+  return createPortal(
     /* Backdrop — items-end on mobile (bottom sheet), items-center on desktop */
     <div
       className="fixed inset-0 z-50 flex items-end md:items-center justify-center md:p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
@@ -112,7 +106,7 @@ export const RecipeModal: React.FC<RecipeModalProps> = ({ recipe, onClose }) => 
             </div>
           </div>
         ) : (
-          <div className="p-5 md:p-6 overflow-y-auto">
+          <div className="p-5 md:p-6 overflow-y-auto flex-1 min-h-0">
             {/* Nutrition Summary */}
             <div className="grid grid-cols-3 gap-3 mb-8 shrink-0">
               <div className="bg-accent-primary/10 rounded-xl p-3 text-center border border-accent-primary/20">
@@ -137,7 +131,7 @@ export const RecipeModal: React.FC<RecipeModalProps> = ({ recipe, onClose }) => 
               </span>
             </h3>
 
-            <div className="space-y-6">
+            <div className="space-y-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
               {steps.map((step, idx) => (
                 <div key={idx} className="relative flex items-start gap-4">
                   <div className="shrink-0 w-8 h-8 rounded-full bg-bg-secondary border border-bg-secondary text-text-primary flex items-center justify-center text-xs font-bold z-10 shadow-sm">
@@ -155,6 +149,7 @@ export const RecipeModal: React.FC<RecipeModalProps> = ({ recipe, onClose }) => 
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

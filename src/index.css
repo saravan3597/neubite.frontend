@@ -47,6 +47,37 @@ body {
   @apply bg-bg-primary text-text-primary antialiased;
 }
 
+/* ── Native mobile feel ──────────────────────────────────────────────────── */
+
+/* Remove blue tap flash on iOS */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Remove 300ms tap delay on buttons and links */
+button, a, input, select, textarea, label {
+  touch-action: manipulation;
+}
+
+/* Prevent iOS from zooming into inputs — all inputs must be at least 16px */
+input:not([type='checkbox']):not([type='radio']),
+select,
+textarea {
+  font-size: max(16px, 1em);
+}
+
+/* Momentum scrolling on iOS */
+.overflow-y-auto,
+.overflow-x-auto {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Safe area utilities */
+.safe-top    { padding-top:    env(safe-area-inset-top); }
+.safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+.safe-left   { padding-left:   env(safe-area-inset-left); }
+.safe-right  { padding-right:  env(safe-area-inset-right); }
+
 /* Hide scrollbar while keeping scroll functionality (for mobile carousels) */
 .scrollbar-none {
   scrollbar-width: none;

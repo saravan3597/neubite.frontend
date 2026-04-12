@@ -107,7 +107,7 @@ export const useGroceryPantryStore = create<GroceryPantryState>()(
 
       consumeIngredients: (ingredients) => {
         set((state) => {
-          let updatedPantry = [...state.pantryItems];
+          const updatedPantry = [...state.pantryItems];
           ingredients.forEach((ing) => {
             if (!ing.inPantry) return;
             const lowerIng = ing.name.toLowerCase();

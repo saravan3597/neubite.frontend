@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import type { PantryUnit } from '../../../shared/stores/useGroceryPantryStore';
 
 // ── Props ────────────────────────────────────────────────────────────────────
@@ -32,31 +33,33 @@ export const IntakeModal: React.FC<IntakeModalProps> = ({ itemName, initialValue
     onSave({ quantity: Number(quantity), unit, expiryDate });
   };
 
-  return (
+  return createPortal(
     /* Backdrop */
     <div
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm sm:p-4"
       onClick={(e) => e.target === e.currentTarget && onCancel()}
     >
-      <div className="w-full sm:max-w-md bg-bg-primary rounded-t-2xl sm:rounded-2xl shadow-2xl border border-bg-secondary overflow-hidden animate-fade-in">
+      <div className="w-full sm:max-w-md bg-bg-primary rounded-t-2xl sm:rounded-2xl shadow-2xl border border-bg-secondary max-h-[90vh] overflow-y-auto animate-fade-in">
 
-        {/* Header */}
-        <div className="px-6 py-4 bg-bg-sidebar border-b border-bg-sidebar-hover">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs font-medium text-text-sidebar uppercase tracking-wider mb-0.5">
-                {isEditing ? 'Edit Pantry Item' : 'Moving to Pantry'}
-              </p>
-              <h2 className="text-base font-bold text-text-sidebar-active truncate">{itemName}</h2>
+        {/* Header — overflow-hidden clips the dark bg to the rounded corners */}
+        <div className="overflow-hidden rounded-t-2xl sticky top-0 z-10">
+          <div className="px-6 py-4 bg-bg-sidebar border-b border-bg-sidebar-hover">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs font-medium text-text-sidebar uppercase tracking-wider mb-0.5">
+                  {isEditing ? 'Edit Pantry Item' : 'Moving to Pantry'}
+                </p>
+                <h2 className="text-base font-bold text-text-sidebar-active truncate">{itemName}</h2>
+              </div>
+              <button
+                onClick={onCancel}
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-text-sidebar hover:text-text-sidebar-active hover:bg-bg-sidebar-hover transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
             </div>
-            <button
-              onClick={onCancel}
-              className="w-8 h-8 rounded-lg flex items-center justify-center text-text-sidebar hover:text-text-sidebar-active hover:bg-bg-sidebar-hover transition-colors"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
           </div>
         </div>
 
@@ -77,7 +80,7 @@ export const IntakeModal: React.FC<IntakeModalProps> = ({ itemName, initialValue
                 placeholder="e.g. 1.5"
                 value={quantity}
                 onChange={(e) => setQuantity(e.target.value)}
-                className={`w-full px-3 py-2.5 rounded-xl border text-sm text-text-primary bg-bg-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-accent-primary/25 focus:border-accent-primary transition-all ${
+                className={`w-full px-3 py-2.5 rounded-xl border text-base text-text-primary bg-bg-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-accent-primary/25 focus:border-accent-primary transition-all ${
                   errors.quantity ? 'border-status-error' : 'border-bg-secondary'
                 }`}
               />
@@ -94,7 +97,7 @@ export const IntakeModal: React.FC<IntakeModalProps> = ({ itemName, initialValue
                 id="intake-unit"
                 value={unit}
                 onChange={(e) => setUnit(e.target.value as PantryUnit)}
-                className="w-full px-3 py-2.5 rounded-xl border border-bg-secondary bg-bg-primary text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary/25 focus:border-accent-primary transition-all cursor-pointer"
+                className="w-full px-3 py-2.5 rounded-xl border border-bg-secondary bg-bg-primary text-base text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary/25 focus:border-accent-primary transition-all cursor-pointer"
               >
                 <option value="kgs">kgs</option>
                 <option value="litres">litres</option>
@@ -125,7 +128,7 @@ export const IntakeModal: React.FC<IntakeModalProps> = ({ itemName, initialValue
         </div>
 
         {/* Actions */}
-        <div className="px-6 pb-5 flex gap-3">
+        <div className="px-6 flex gap-3" style={{ paddingBottom: 'max(1.25rem, env(safe-area-inset-bottom))' }}>
           <button
             onClick={onCancel}
             className="flex-1 px-4 py-2.5 rounded-xl border border-bg-secondary text-sm font-semibold text-text-secondary hover:bg-bg-secondary transition-colors"
@@ -141,6 +144,7 @@ export const IntakeModal: React.FC<IntakeModalProps> = ({ itemName, initialValue
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

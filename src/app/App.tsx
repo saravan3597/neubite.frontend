@@ -6,20 +6,19 @@ import { useGroceryPantryStore } from '../shared/stores/useGroceryPantryStore';
 import { useRecipeStore } from '../shared/stores/useRecipeStore';
 import { Amplify } from 'aws-amplify';
 
+Amplify.configure({
+  Auth: {
+    Cognito: {
+      userPoolId: import.meta.env.VITE_COGNITO_USER_POOL_ID as string,
+      userPoolClientId: import.meta.env.VITE_COGNITO_CLIENT_ID as string,
+    },
+  },
+});
 
 export const App: React.FC = () => {
   const { checkSession, isLoading } = useAuthStore();
   const loadPantryAndGrocery = useGroceryPantryStore((s) => s.loadFromServer);
   const loadSavedRecipes = useRecipeStore((s) => s.loadFromServer);
-
-  Amplify.configure({
-    Auth: {
-      Cognito: {
-        userPoolId: 'us-east-2_h28swzclb',
-        userPoolClientId: '71aq33t3lqfms0qjojkjcljln7',
-      }
-    }
-  });
 
   useEffect(() => {
     checkSession();

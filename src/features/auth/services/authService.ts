@@ -69,7 +69,7 @@ export const getUserSession = async () => {
   try {
     const session = await fetchAuthSession();
     return session.tokens ? session : null;
-  } catch (error) {
+  } catch {
     return null;
   }
 };
