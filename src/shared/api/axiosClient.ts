@@ -27,8 +27,10 @@ axiosClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Handle unauthorized errors, e.g., clear session
-      useAuthStore.getState().logout();
+      // Token may have expired — try to silently refresh the Cognito session.
+      // checkSession() will update isAuthenticated without calling signOut(),
+      // so we never boot the user unless their Cognito session is truly gone.
+      useAuthStore.getState().checkSession();
     }
     return Promise.reject(error);
   }

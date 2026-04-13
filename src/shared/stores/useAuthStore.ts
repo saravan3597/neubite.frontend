@@ -45,7 +45,12 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   logout: async () => {
-    await handleSignOut();
+    try {
+      await handleSignOut();
+    } catch {
+      // Ignore Cognito errors during sign-out (e.g. already signed out).
+      // Always clear local state so the app doesn't get stuck.
+    }
     set({ user: null, token: null, isAuthenticated: false });
   },
 

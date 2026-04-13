@@ -6,7 +6,7 @@ import type {
   TimeOfDay,
   AiRecipeResponse,
 } from '../types/recipe.types';
-import { MOCK_RECIPES, MEAL_TIME_MAP } from '../mocks/recipeMocks';
+import { MOCK_RECIPES, MOCK_PANTRY_ITEMS, MEAL_TIME_MAP } from '../mocks/recipeMocks';
 
 // ── Time-of-day helper ────────────────────────────────────────────────────────
 
@@ -108,7 +108,14 @@ const fetchMockRecipes = (params: RecipeSuggestionParams): Recipe[] => {
     selected = [...selected, ...extras].sort((a, b) => a.timeToCook - b.timeToCook);
   }
 
-  return enrichWithPantry(selected, pantryIngredients);
+  // Use the real pantry for enrichment when available; fall back to the mock
+  // pantry so the fallback view always shows realistic inPantry flags.
+  const enrichmentPantry =
+    pantryIngredients.length > 0
+      ? pantryIngredients
+      : MOCK_PANTRY_ITEMS.map((p) => ({ name: p.name, quantity: p.quantity, unit: p.unit }));
+
+  return enrichWithPantry(selected, enrichmentPantry);
 };
 
 // ── Main service function ─────────────────────────────────────────────────────

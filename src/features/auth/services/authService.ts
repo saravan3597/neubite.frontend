@@ -45,12 +45,17 @@ export const handleConfirmSignUp = async (email: string, code: string) => {
 
 export const handleSignIn = async (email: string, password: string) => {
   try {
-    const { isSignedIn, nextStep } = await signIn({
-      username: email,
-      password,
-    });
+    const { isSignedIn, nextStep } = await signIn({ username: email, password });
     return { success: true, isSignedIn, nextStep };
   } catch (error) {
+    // Cognito throws UserAlreadyAuthenticatedException when a stale local session
+    // wasn't fully cleared (e.g. a previous sign-out failed mid-flight). Clear it
+    // locally and retry once so the user isn't stuck on the login screen.
+    if (error instanceof Error && error.name === 'UserAlreadyAuthenticatedException') {
+      await signOut().catch(() => undefined);
+      const { isSignedIn, nextStep } = await signIn({ username: email, password });
+      return { success: true, isSignedIn, nextStep };
+    }
     console.error("Error signing in:", error);
     throw error;
   }
