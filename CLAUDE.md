@@ -68,7 +68,28 @@ features/
 - **Components**: Keep UI components pure — move business logic into custom hooks.
 - **State**: Use Zustand for global state; keep stores modular.
 - **Auth**: All Cognito interactions must go through `features/auth/services/authService.ts` — never call `aws-amplify` directly from components or stores.
-- **API calls**: Use the Axios client; never `fetch` directly. Read env vars via `import.meta.env`, never hardcode them.
+- **API calls**: Use the Axios client; never `fetch` directly. Attach the Cognito JWT Bearer token via the Axios request interceptor in `axiosClient.ts`. Read env vars via `import.meta.env`, never hardcode them.
+- **Feature organization**: Group files by Feature-Sliced Design (`src/features/[name]/`) rather than by technical type.
+
+## UI Color Palette
+
+Always use the following CSS variables when generating, updating, or styling UI components. Do not introduce new hex codes outside this palette unless explicitly requested.
+
+| Variable | Value | Usage |
+|---|---|---|
+| `--bg-primary` | `#FFFFFF` | Primary backgrounds; ensures food imagery pops |
+| `--bg-secondary` | `#F9F7F4` | Subtle surface separation — ingredient panels, recipe cards |
+| `--bg-sidebar` | `#2A3A35` | Primary navigation sidebar |
+| `--bg-sidebar-hover` | `#3B4D47` | Sidebar hover states |
+| `--text-primary` | `#232323` | Body text (soft charcoal, WCAG AAA compliant) |
+| `--text-secondary` | `#686868` | Metadata, prep times, subtle UI text |
+| `--text-sidebar` | `#A9B8B2` | Unselected sidebar items |
+| `--text-sidebar-active` | `#FFFFFF` | Active/selected sidebar items |
+| `--accent-primary` | `#D14925` | Primary CTAs — "Save Recipe", active states |
+| `--accent-hover` | `#A8381A` | Hover state for accent elements |
+| `--status-success` | `#288754` | Success toasts, healthy dietary badges |
+| `--status-warning` | `#D99414` | Warnings, pending states |
+| `--status-error` | `#C92A2A` | Destructive actions, alerts, form errors |
 
 ## Environment Variables
 
