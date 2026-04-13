@@ -95,7 +95,10 @@ export const Login: React.FC = () => {
       <div className="flex-1 flex flex-col overflow-y-auto bg-bg-secondary">
 
         {/* Mobile: branded header block — replaces the awkward absolute strip */}
-        <div className="md:hidden bg-bg-sidebar px-6 pt-12 pb-8 rounded-b-[2rem] shrink-0 relative overflow-hidden">
+        <div className="md:hidden bg-bg-sidebar rounded-b-[2rem] shrink-0 relative overflow-hidden">
+          {/* Fills the space behind the status bar / Dynamic Island */}
+          <div style={{ height: 'max(env(safe-area-inset-top), 50px)' }} />
+          <div className="px-6 pt-5 pb-8">
           <div className="flex items-center gap-3 mb-5">
             <NLogo size="md" />
             <span className="text-xl font-bold text-text-sidebar-active tracking-tight">Neubite</span>
@@ -110,6 +113,7 @@ export const Login: React.FC = () => {
             className="absolute inset-0 pointer-events-none"
             style={{ backgroundImage: 'radial-gradient(circle at 90% 10%, rgba(209,73,37,0.18) 0%, transparent 60%)' }}
           />
+          </div>
         </div>
 
         {/* Form area — scrollable, top-anchored on mobile, centered on desktop */}

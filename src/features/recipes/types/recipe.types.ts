@@ -5,6 +5,7 @@ export interface Ingredient {
   name: string;
   quantity: string;
   inPantry: boolean;
+  quantityToDeduct: number;
 }
 
 export interface NutritionalData {
@@ -33,10 +34,16 @@ export interface Recipe {
 
 // ── AI service params ─────────────────────────────────────────────────────────
 
+export interface PantryIngredient {
+  name: string;
+  quantity: number;
+  unit: string;
+}
+
 export interface RecipeSuggestionParams {
   timeOfDay: TimeOfDay;
   maxPrepTime: number;
-  pantryIngredients: string[];
+  pantryIngredients: PantryIngredient[];
 }
 
 export interface AiRecipeResponse {

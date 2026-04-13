@@ -11,6 +11,11 @@ node_modules
 dist
 dist-ssr
 *.local
+.env
+
+# Capacitor native projects (generated — run `npx cap sync` to recreate)
+ios/
+android/
 
 # Editor directories and files
 .vscode/*

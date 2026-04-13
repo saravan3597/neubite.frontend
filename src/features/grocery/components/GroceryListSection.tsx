@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useGroceryPantryStore, type PantryUnit } from '../../../shared/stores/useGroceryPantryStore';
 import { IntakeModal } from './IntakeModal';
 
@@ -10,19 +10,9 @@ export const GroceryListSection: React.FC = () => {
 
   const unpurchased = groceries.filter((g) => !g.isPurchased);
 
-  // Collapsed by default; auto-opens whenever unpurchased items exist
   const [isExpanded, setIsExpanded] = useState(unpurchased.length > 0);
   const [inputValue, setInputValue] = useState('');
   const [pendingItemId, setPendingItemId] = useState<string | null>(null);
-
-  // Auto-expand when items are added; auto-collapse when list becomes empty
-  useEffect(() => {
-    if (unpurchased.length > 0) {
-      setIsExpanded(true);
-    } else {
-      setIsExpanded(false);
-    }
-  }, [unpurchased.length]);
 
   const handleAdd = () => {
     if (!inputValue.trim()) return;
@@ -98,7 +88,7 @@ export const GroceryListSection: React.FC = () => {
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  className="flex-1 px-3.5 py-2.5 rounded-xl border border-bg-secondary bg-bg-secondary text-sm text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-accent-primary/25 focus:border-accent-primary focus:bg-bg-primary transition-all"
+                  className="flex-1 px-3.5 py-2.5 rounded-xl border border-bg-secondary bg-bg-secondary text-base text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-accent-primary/25 focus:border-accent-primary focus:bg-bg-primary transition-all"
                 />
                 <button
                   id="grocery-add-btn"

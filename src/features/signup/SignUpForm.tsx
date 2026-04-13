@@ -25,8 +25,8 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleToLogin }) => {
       await handleSignUp(email, password, name);
       setSuccessMsg('Account created! Check your email for a verification code.');
       setIsConfirming(true);
-    } catch (err: any) {
-      setError(err.message || 'Failed to create account. Please try again.');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to create account. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -40,8 +40,8 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleToLogin }) => {
       await handleConfirmSignUp(email, verificationCode);
       setSuccessMsg('Account verified! You can now sign in.');
       setIsConfirming(false);
-    } catch (err: any) {
-      setError(err.message || 'Failed to verify code. Please try again.');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to verify code. Please try again.');
     } finally {
       setLoading(false);
     }
