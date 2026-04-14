@@ -9,15 +9,23 @@ Neubite is an AI-powered meal planning app that suggests recipes based on your p
 ## Screenshots
 
 <!-- Screenshot: Login screen -->
+
 ![Login](.github/screenshots/login.png)
 
 <!-- Screenshot: Dashboard — recipe suggestions -->
+
 ![Dashboard](.github/screenshots/dashboard.png)
 
 <!-- Screenshot: Pantry management -->
+
 ![Pantry](.github/screenshots/pantry.png)
 
+<!-- Screenshot: Pantry item addition modal -->
+
+![Pantry modal](.github/screenshots/pantry-modal.png)
+
 <!-- Screenshot: Mobile bottom nav -->
+
 ![Mobile — bottom nav](.github/screenshots/mobile.png)
 
 ---
@@ -86,6 +94,7 @@ Open [http://localhost:5173](http://localhost:5173). You can log in with any cre
 A **Demo / Live** toggle is available in the sidebar (desktop) and the Profile sheet (mobile).
 
 When **Demo** is active (default):
+
 - All API calls are skipped — no backend needed
 - Pantry is pre-seeded with mock ingredients (Rice, Onion, Chillies, etc.)
 - Recipe suggestions are generated from mock data matched to time of day
@@ -97,12 +106,12 @@ Switch to **Live** to connect to a real NestJS backend and Cognito user pool.
 
 ## Available Scripts
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start local dev server |
+| Command         | Description                   |
+| --------------- | ----------------------------- |
+| `npm run dev`   | Start local dev server        |
 | `npm run build` | Type-check + production build |
-| `npm run lint` | Run ESLint |
-| `npx vitest` | Run unit tests |
+| `npm run lint`  | Run ESLint                    |
+| `npx vitest`    | Run unit tests                |
 
 ---
 
@@ -149,11 +158,34 @@ src/
 
 ## Environment Variables Reference
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `VITE_API_URL` | No* | NestJS backend base URL |
-| `VITE_AI_API_URL` | No* | AI recipe suggestions endpoint |
-| `VITE_COGNITO_USER_POOL_ID` | No* | AWS Cognito User Pool ID |
-| `VITE_COGNITO_CLIENT_ID` | No* | AWS Cognito App Client ID |
+| Variable                    | Required | Description                    |
+| --------------------------- | -------- | ------------------------------ |
+| `VITE_API_URL`              | No\*     | NestJS backend base URL        |
+| `VITE_AI_API_URL`           | No\*     | AI recipe suggestions endpoint |
+| `VITE_COGNITO_USER_POOL_ID` | No\*     | AWS Cognito User Pool ID       |
+| `VITE_COGNITO_CLIENT_ID`    | No\*     | AWS Cognito App Client ID      |
 
-*Not required in Demo mode.
+\*Not required in Demo mode.
+
+---
+
+## Claude Code
+
+This repo includes a `CLAUDE.md` file that gives [Claude Code](https://claude.ai/code) full context about the project — architecture, color palette, code standards, and environment variables. Claude Code can navigate, edit, and extend this codebase without additional explanation.
+
+To get started:
+
+```bash
+# Install Claude Code (if not already installed)
+npm install -g @anthropic/claude-code
+
+# Launch in this repo
+claude
+```
+
+Key things Claude Code knows about this project:
+- Feature-Sliced Design folder structure under `src/features/`
+- Tailwind CSS v4 with CSS custom properties — color palette is defined in `CLAUDE.md`, never use raw hex values
+- All Cognito calls go through `features/auth/services/authService.ts` only
+- Mock mode is controlled via `shared/utils/mockMode.ts` — check `isMockMode()` before any API call
+- Zustand stores use `persist` middleware; bump `version` to force a localStorage reset when seeding new default data
