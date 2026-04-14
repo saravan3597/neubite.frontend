@@ -5,6 +5,7 @@ import {
   type PantryUnit,
 } from "../../../shared/stores/useGroceryPantryStore";
 import { IntakeModal } from "./IntakeModal";
+import { PantryIcon, TrashIcon, PencilIcon, PlusIcon } from "../../../shared/components/icons";
 
 const formatQty = (n: number) => parseFloat(n.toFixed(1));
 
@@ -29,7 +30,8 @@ const expiryStatus = (iso: string): "ok" | "soon" | "expired" => {
   return "ok";
 };
 
-const ExpiryBadge: React.FC<{ iso: string }> = ({ iso }) => {
+const ExpiryBadge: React.FC<{ iso?: string | null }> = ({ iso }) => {
+  if (!iso) return <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-bg-secondary text-text-secondary">No expiry</span>;
   const status = expiryStatus(iso);
   const classes = {
     ok: "bg-status-success/10 text-status-success",
@@ -46,73 +48,35 @@ const ExpiryBadge: React.FC<{ iso: string }> = ({ iso }) => {
   );
 };
 
-const TrashIcon = () => (
-  <svg
-    className="w-4 h-4"
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-    />
-  </svg>
-);
-
-const PencilIcon = () => (
-  <svg
-    className="w-4 h-4"
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M15.232 5.232l3.536 3.536M9 13l6.586-6.586a2 2 0 012.828 2.828L11.828 15.828a2 2 0 01-1.414.586H7v-3a2 2 0 01.586-1.414z"
-    />
-  </svg>
-);
 
 // ── Component ────────────────────────────────────────────────────────────────
 
 export const PantrySection: React.FC = () => {
   const { pantryItems, removePantryItem, addPantryItem, updatePantryItem } =
     useGroceryPantryStore();
-  const [newItemName, setNewItemName] = useState("");
-  const [pendingItemName, setPendingItemName] = useState<string | null>(null);
+  const [isAddingNew, setIsAddingNew] = useState(false);
   const [editingItem, setEditingItem] = useState<PantryItem | null>(null);
 
-  const handleAdd = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newItemName.trim()) return;
-    setPendingItemName(newItemName.trim());
-  };
-
   const handleModalSave = (details: {
+    name: string;
     quantity: number;
     unit: PantryUnit;
-    expiryDate: string;
+    expiryDate: string | null;
   }) => {
-    if (!pendingItemName) return;
-    addPantryItem({ name: pendingItemName, ...details });
-    setPendingItemName(null);
-    setNewItemName("");
+    addPantryItem(details);
+    setIsAddingNew(false);
   };
 
   const handleModalCancel = () => {
-    setPendingItemName(null);
+    setIsAddingNew(false);
     setEditingItem(null);
   };
 
   const handleEditSave = (details: {
+    name: string;
     quantity: number;
     unit: PantryUnit;
-    expiryDate: string;
+    expiryDate: string | null;
   }) => {
     if (!editingItem) return;
     updatePantryItem(editingItem.id, details);
@@ -122,27 +86,13 @@ export const PantrySection: React.FC = () => {
   return (
     <>
       <div className="bg-bg-primary rounded-2xl border border-bg-secondary overflow-hidden">
-        {/* Header — stacked on mobile, inline on sm+ */}
-        <div className="px-4 sm:px-5 py-4 border-b border-bg-secondary flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        {/* Header */}
+        <div className="px-4 sm:px-5 py-4 border-b border-bg-secondary flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
             <div className="w-7 h-7 rounded-lg bg-status-success/10 flex items-center justify-center">
-              <svg
-                className="w-3.5 h-3.5 text-status-success"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-                />
-              </svg>
+              <PantryIcon className="w-3.5 h-3.5 text-status-success" />
             </div>
-            <h2 className="text-base font-semibold text-text-primary">
-              Pantry
-            </h2>
+            <h2 className="text-base font-semibold text-text-primary">Pantry</h2>
             {pantryItems.length > 0 && (
               <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-status-success/10 text-status-success">
                 {pantryItems.length}
@@ -150,43 +100,20 @@ export const PantrySection: React.FC = () => {
             )}
           </div>
 
-          <form
-            onSubmit={handleAdd}
-            className="flex gap-2 w-full sm:w-auto sm:min-w-[200px]"
+          <button
+            onClick={() => setIsAddingNew(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-bg-secondary text-xs font-semibold text-text-secondary hover:border-status-success/40 hover:text-status-success hover:bg-status-success/5 transition-all"
           >
-            <input
-              type="text"
-              value={newItemName}
-              onChange={(e) => setNewItemName(e.target.value)}
-              placeholder="Add directly to pantry..."
-              className="flex-1 sm:w-48 px-3 py-2 text-base bg-bg-secondary border-none rounded-lg focus:outline-none focus:ring-1 focus:ring-accent-primary/30 text-text-primary placeholder:text-text-secondary"
-            />
-            <button
-              type="submit"
-              className="px-3 py-2 text-sm bg-status-success/10 text-status-success hover:bg-status-success/20 rounded-lg transition-colors font-medium shrink-0"
-            >
-              Add
-            </button>
-          </form>
+            <PlusIcon className="w-3.5 h-3.5" />
+            Add item
+          </button>
         </div>
 
         {/* Content */}
         {pantryItems.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-10 text-center px-6">
             <div className="w-10 h-10 bg-bg-secondary rounded-xl flex items-center justify-center mb-3">
-              <svg
-                className="w-5 h-5 text-text-secondary"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-                />
-              </svg>
+              <PantryIcon className="w-5 h-5 text-text-secondary" />
             </div>
             <p className="text-sm font-medium text-text-primary mb-0.5">
               Pantry is empty
@@ -220,14 +147,14 @@ export const PantrySection: React.FC = () => {
                     className="p-2 rounded-lg text-text-secondary hover:text-accent-primary hover:bg-accent-primary/10 transition-all shrink-0"
                     title="Edit item"
                   >
-                    <PencilIcon />
+                    <PencilIcon className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => removePantryItem(item.id)}
                     className="p-2 rounded-lg text-text-secondary hover:text-status-error hover:bg-status-error/10 transition-all shrink-0"
                     title="Remove from pantry"
                   >
-                    <TrashIcon />
+                    <TrashIcon className="w-4 h-4" />
                   </button>
                 </div>
               ))}
@@ -272,14 +199,14 @@ export const PantrySection: React.FC = () => {
                             className="p-1.5 rounded-lg text-text-secondary hover:text-accent-primary hover:bg-accent-primary/10 transition-all"
                             title="Edit item"
                           >
-                            <PencilIcon />
+                            <PencilIcon className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => removePantryItem(item.id)}
                             className="p-1.5 rounded-lg text-text-secondary hover:text-status-error hover:bg-status-error/10 transition-all"
                             title="Remove from pantry"
                           >
-                            <TrashIcon />
+                            <TrashIcon className="w-4 h-4" />
                           </button>
                         </div>
                       </td>
@@ -292,9 +219,8 @@ export const PantrySection: React.FC = () => {
         )}
       </div>
 
-      {pendingItemName && (
+      {isAddingNew && (
         <IntakeModal
-          itemName={pendingItemName}
           onSave={handleModalSave}
           onCancel={handleModalCancel}
         />

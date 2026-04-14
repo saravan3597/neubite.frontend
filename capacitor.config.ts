@@ -11,6 +11,11 @@ const config: CapacitorConfig = {
       // pushing the entire layout up and overlapping the status bar.
       resize: 'none',
     },
+    LocalNotifications: {
+      smallIcon: 'ic_stat_neubite',
+      iconColor: '#D14925',
+      sound: 'default',
+    },
   },
 };
 

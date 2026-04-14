@@ -5,6 +5,9 @@ import { useAuthStore } from '../shared/stores/useAuthStore';
 import { useGroceryPantryStore } from '../shared/stores/useGroceryPantryStore';
 import { useRecipeStore } from '../shared/stores/useRecipeStore';
 import { Amplify } from 'aws-amplify';
+import { LocalNotifications } from '@capacitor/local-notifications';
+import { Capacitor } from '@capacitor/core';
+import { scheduleWeeklyMealNotifications } from '../shared/services/notificationService';
 
 Amplify.configure({
   Auth: {
@@ -21,10 +24,30 @@ export const App: React.FC = () => {
   const loadSavedRecipes = useRecipeStore((s) => s.loadFromServer);
 
   useEffect(() => {
-    checkSession();
-    loadPantryAndGrocery();
-    loadSavedRecipes();
+    // checkSession must complete first so the token is in the store
+    // before any authenticated API calls are made.
+    checkSession().then(() => {
+      loadPantryAndGrocery();
+      loadSavedRecipes();
+    });
   }, [checkSession, loadPantryAndGrocery, loadSavedRecipes]);
+
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+
+    // Schedule 7-day rolling batch of meal-time notifications
+    scheduleWeeklyMealNotifications();
+
+    // When user taps a notification, navigate to the route stored in extra.route
+    const listener = LocalNotifications.addListener('localNotificationActionPerformed', (action) => {
+      const route: string = action.notification.extra?.route ?? '/dashboard';
+      router.navigate(route);
+    });
+
+    return () => {
+      listener.then(l => l.remove());
+    };
+  }, []);
 
   if (isLoading) {
     return (

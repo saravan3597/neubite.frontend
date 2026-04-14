@@ -1,35 +1,17 @@
 import React, { useState } from 'react';
 import { useAuthStore } from '../shared/stores/useAuthStore';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
+import { MealTimeNotification } from '../shared/components/MealTimeNotification';
+import {
+  DashboardIcon, PantryIcon, LogoutIcon,
+  ChevronRightIcon, ChevronLeftIcon,
+} from '../shared/components/icons';
+import { isMockMode, setMockMode } from '../shared/utils/mockMode';
 
-// ── Icons ──────────────────────────────────────────────────────────────
-const DashboardIcon = ({ active }: { active?: boolean }) => (
-  <svg className="w-5 h-5" fill={active ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={active ? 0 : 2}
-      d="M4 5a1 1 0 011-1h4a1 1 0 011 1v5a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm10 0a1 1 0 011-1h4a1 1 0 011 1v2a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zm10-3a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1h-4a1 1 0 01-1-1v-7z" />
-  </svg>
-);
-
-const PantryIcon = ({ active }: { active?: boolean }) => (
-  <svg className="w-5 h-5" fill={active ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={active ? 0 : 2}
-      d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-  </svg>
-);
-
-const LogoutIcon = () => (
-  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-      d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-  </svg>
-);
-
-const CollapseIcon = ({ collapsed }: { collapsed: boolean }) => (
-  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5}
-      d={collapsed ? 'M9 5l7 7-7 7' : 'M15 19l-7-7 7-7'} />
-  </svg>
-);
+const CollapseIcon = ({ collapsed }: { collapsed: boolean }) =>
+  collapsed
+    ? <ChevronRightIcon className="w-3.5 h-3.5" />
+    : <ChevronLeftIcon  className="w-3.5 h-3.5" />;
 
 // ── Route meta ─────────────────────────────────────────────────────────
 const navLinks = [
@@ -73,10 +55,7 @@ const LogoutConfirmDialog = ({ onConfirm, onCancel }: { onConfirm: () => void; o
 
       <div className="px-6 pt-5 pb-7 md:py-8 text-center">
         <div className="w-12 h-12 bg-status-error/10 rounded-full flex items-center justify-center mx-auto mb-4">
-          <svg className="w-5 h-5 text-status-error" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-          </svg>
+          <LogoutIcon className="w-5 h-5 text-status-error" />
         </div>
         <h3 className="text-lg font-bold text-text-primary mb-1">Sign out?</h3>
         <p className="text-sm text-text-secondary mb-6">
@@ -134,7 +113,11 @@ const ProfileSheet = ({ displayName, email, initials, onSignOut, onClose }: Prof
       </div>
 
       {/* Actions */}
-      <div className="p-4">
+      <div className="p-4 space-y-2">
+        <div className="flex items-center justify-between px-4 py-3 rounded-xl bg-bg-secondary">
+          <span className="text-sm font-semibold text-text-primary">Demo mode</span>
+          <MockToggle />
+        </div>
         <button
           onClick={onSignOut}
           className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-status-error bg-status-error/8 hover:bg-status-error/12 active:bg-status-error/20 transition-colors font-semibold text-sm"
@@ -151,6 +134,32 @@ const ProfileSheet = ({ displayName, email, initials, onSignOut, onClose }: Prof
 );
 
 // ── Sidebar content ─────────────────────────────────────────────────────
+// ── Mock mode toggle ────────────────────────────────────────────────────
+const MockToggle = ({ collapsed }: { collapsed?: boolean }) => {
+  const [mock, setMock] = useState(isMockMode);
+  const toggle = () => {
+    const next = !mock;
+    setMockMode(next);
+    setMock(next);
+    window.location.reload();
+  };
+  if (collapsed) return null;
+  return (
+    <button
+      onClick={toggle}
+      title={mock ? 'Switch to Live API' : 'Switch to Demo mode'}
+      className="w-full flex items-center justify-between px-3 py-2 rounded-lg transition-colors hover:bg-bg-sidebar-hover"
+    >
+      <span className="text-xs font-semibold text-text-sidebar uppercase tracking-widest">
+        {mock ? 'Demo' : 'Live'}
+      </span>
+      <span className={`relative inline-flex h-5 w-9 shrink-0 rounded-full transition-colors duration-200 ${mock ? 'bg-accent-primary' : 'bg-bg-sidebar-hover border border-text-sidebar/30'}`}>
+        <span className={`inline-block h-4 w-4 rounded-full bg-white shadow transition-transform duration-200 mt-0.5 ${mock ? 'translate-x-4' : 'translate-x-0.5'}`} />
+      </span>
+    </button>
+  );
+};
+
 interface SidebarContentProps {
   collapsed: boolean;
   initials: string;
@@ -211,6 +220,7 @@ const SidebarContent: React.FC<SidebarContentProps> = ({ collapsed, initials, di
           </div>
         </div>
       )}
+      <MockToggle collapsed={collapsed} />
       <button
         onClick={onLogoutClick}
         className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium text-text-sidebar hover:text-status-error hover:bg-bg-sidebar-hover transition-colors ${collapsed ? 'justify-center' : ''}`}
@@ -349,6 +359,9 @@ export const Layout: React.FC = () => {
           onCancel={() => setShowLogoutConfirm(false)}
         />
       )}
+
+      {/* ── Meal-time notification ── */}
+      <MealTimeNotification />
     </div>
   );
 };

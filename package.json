@@ -15,6 +15,7 @@
     "@capacitor/core": "^8.3.0",
     "@capacitor/ios": "^8.3.0",
     "@capacitor/keyboard": "^8.0.3",
+    "@capacitor/local-notifications": "^8.0.2",
     "aws-amplify": "^6.16.3",
     "axios": "^1.14.0",
     "react": "^19.2.4",

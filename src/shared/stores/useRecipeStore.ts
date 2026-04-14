@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { Recipe } from '../../features/recipes/types/recipe.types';
 import { savedRecipesApi } from '../api/savedRecipesApi';
+import { isMockMode } from '../utils/mockMode';
 
 // ── Interface ────────────────────────────────────────────────────────────────
 
@@ -21,6 +22,7 @@ export const useRecipeStore = create<RecipeState>()(
       savedRecipes: [],
 
       loadFromServer: async () => {
+        if (isMockMode()) return; // demo mode — keep localStorage state
         try {
           const savedRecipes = await savedRecipesApi.fetchAll();
           set({ savedRecipes });

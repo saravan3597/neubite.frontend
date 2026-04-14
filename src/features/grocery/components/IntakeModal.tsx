@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import type { PantryUnit } from '../../../shared/stores/useGroceryPantryStore';
+import { CloseIcon } from '../../../shared/components/icons';
 
 // ── Props ────────────────────────────────────────────────────────────────────
 
 interface IntakeModalProps {
-  itemName: string;
-  initialValues?: { quantity: number; unit: PantryUnit; expiryDate: string };
-  onSave: (details: { quantity: number; unit: PantryUnit; expiryDate: string }) => void;
+  /** Pre-filled when moving from grocery checklist or editing. Absent when adding fresh. */
+  itemName?: string;
+  initialValues?: { quantity: number; unit: PantryUnit; expiryDate?: string | null };
+  onSave: (details: { name: string; quantity: number; unit: PantryUnit; expiryDate: string | null }) => void;
   onCancel: () => void;
 }
 
@@ -15,23 +17,35 @@ interface IntakeModalProps {
 
 export const IntakeModal: React.FC<IntakeModalProps> = ({ itemName, initialValues, onSave, onCancel }) => {
   const isEditing = !!initialValues;
-  const [quantity, setQuantity] = useState<string>(initialValues ? String(initialValues.quantity) : '');
-  const [unit, setUnit] = useState<PantryUnit>(initialValues?.unit ?? 'kgs');
+  const showNameField = !itemName;
+
+  const [name,       setName]       = useState(itemName ?? '');
+  const [quantity,   setQuantity]   = useState<string>(initialValues ? String(initialValues.quantity) : '');
+  const [unit,       setUnit]       = useState<PantryUnit>(initialValues?.unit ?? 'kgs');
   const [expiryDate, setExpiryDate] = useState<string>(initialValues?.expiryDate ?? '');
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [noExpiry,   setNoExpiry]   = useState(!initialValues?.expiryDate);
+  const [errors,     setErrors]     = useState<Record<string, string>>({});
 
   const validate = (): boolean => {
     const next: Record<string, string> = {};
+    if (showNameField && !name.trim()) next.name = 'Item name is required';
     if (!quantity || Number(quantity) <= 0) next.quantity = 'Enter a valid quantity';
-    if (!expiryDate) next.expiryDate = 'Expiry date is required';
+    if (!noExpiry && !expiryDate) next.expiryDate = 'Expiry date is required';
     setErrors(next);
     return Object.keys(next).length === 0;
   };
 
   const handleSave = () => {
     if (!validate()) return;
-    onSave({ quantity: Number(quantity), unit, expiryDate });
+    onSave({
+      name: name.trim() || itemName!,
+      quantity: Number(quantity),
+      unit,
+      expiryDate: noExpiry ? null : expiryDate,
+    });
   };
+
+  const displayName = name || itemName || 'New Item';
 
   return createPortal(
     /* Backdrop */
@@ -41,23 +55,21 @@ export const IntakeModal: React.FC<IntakeModalProps> = ({ itemName, initialValue
     >
       <div className="w-full sm:max-w-md bg-bg-primary rounded-t-2xl sm:rounded-2xl shadow-2xl border border-bg-secondary max-h-[90vh] overflow-y-auto animate-fade-in">
 
-        {/* Header — overflow-hidden clips the dark bg to the rounded corners */}
+        {/* Header */}
         <div className="overflow-hidden rounded-t-2xl sticky top-0 z-10">
           <div className="px-6 py-4 bg-bg-sidebar border-b border-bg-sidebar-hover">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-medium text-text-sidebar uppercase tracking-wider mb-0.5">
-                  {isEditing ? 'Edit Pantry Item' : 'Moving to Pantry'}
+                  {isEditing ? 'Edit Pantry Item' : 'Add to Pantry'}
                 </p>
-                <h2 className="text-base font-bold text-text-sidebar-active truncate">{itemName}</h2>
+                <h2 className="text-base font-bold text-text-sidebar-active truncate">{displayName}</h2>
               </div>
               <button
                 onClick={onCancel}
                 className="w-8 h-8 rounded-lg flex items-center justify-center text-text-sidebar hover:text-text-sidebar-active hover:bg-bg-sidebar-hover transition-colors"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <CloseIcon className="w-4 h-4" />
               </button>
             </div>
           </div>
@@ -65,6 +77,29 @@ export const IntakeModal: React.FC<IntakeModalProps> = ({ itemName, initialValue
 
         {/* Form */}
         <div className="px-6 py-5 space-y-4">
+
+          {/* Item name — only when adding fresh (not from checklist, not editing) */}
+          {showNameField && (
+            <div>
+              <label className="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-1.5">
+                Item Name
+              </label>
+              <input
+                id="intake-name"
+                type="text"
+                placeholder="e.g. Basmati Rice"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className={`w-full px-3 py-2.5 rounded-xl border text-base text-text-primary bg-bg-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-accent-primary/25 focus:border-accent-primary transition-all ${
+                  errors.name ? 'border-status-error' : 'border-[#DDD9D4]'
+                }`}
+                autoFocus
+              />
+              {errors.name && (
+                <p className="text-xs text-status-error mt-1">{errors.name}</p>
+              )}
+            </div>
+          )}
 
           {/* Quantity + Unit row */}
           <div className="flex gap-3">
@@ -81,7 +116,7 @@ export const IntakeModal: React.FC<IntakeModalProps> = ({ itemName, initialValue
                 value={quantity}
                 onChange={(e) => setQuantity(e.target.value)}
                 className={`w-full px-3 py-2.5 rounded-xl border text-base text-text-primary bg-bg-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-accent-primary/25 focus:border-accent-primary transition-all ${
-                  errors.quantity ? 'border-status-error' : 'border-bg-secondary'
+                  errors.quantity ? 'border-status-error' : 'border-[#DDD9D4]'
                 }`}
               />
               {errors.quantity && (
@@ -97,7 +132,7 @@ export const IntakeModal: React.FC<IntakeModalProps> = ({ itemName, initialValue
                 id="intake-unit"
                 value={unit}
                 onChange={(e) => setUnit(e.target.value as PantryUnit)}
-                className="w-full px-3 py-2.5 rounded-xl border border-bg-secondary bg-bg-primary text-base text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary/25 focus:border-accent-primary transition-all cursor-pointer"
+                className="w-full px-3 py-2.5 rounded-xl border border-[#DDD9D4] bg-bg-primary text-base text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary/25 focus:border-accent-primary transition-all cursor-pointer"
               >
                 <option value="kgs">kgs</option>
                 <option value="litres">litres</option>
@@ -108,21 +143,36 @@ export const IntakeModal: React.FC<IntakeModalProps> = ({ itemName, initialValue
 
           {/* Expiry Date */}
           <div>
-            <label className="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-1.5">
-              Expiry Date
-            </label>
-            <input
-              id="intake-expiry"
-              type="date"
-              value={expiryDate}
-              min={new Date().toISOString().split('T')[0]}
-              onChange={(e) => setExpiryDate(e.target.value)}
-              className={`w-full px-3 py-2.5 rounded-xl border text-sm text-text-primary bg-bg-primary focus:outline-none focus:ring-2 focus:ring-accent-primary/25 focus:border-accent-primary transition-all ${
-                errors.expiryDate ? 'border-status-error' : 'border-bg-secondary'
-              }`}
-            />
-            {errors.expiryDate && (
-              <p className="text-xs text-status-error mt-1">{errors.expiryDate}</p>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
+                Expiry Date
+              </label>
+              <label className="flex items-center gap-1.5 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={noExpiry}
+                  onChange={(e) => { setNoExpiry(e.target.checked); if (e.target.checked) setExpiryDate(''); }}
+                  className="w-3.5 h-3.5 rounded accent-accent-primary"
+                />
+                <span className="text-xs text-text-secondary">Doesn't expire</span>
+              </label>
+            </div>
+            {!noExpiry && (
+              <>
+                <input
+                  id="intake-expiry"
+                  type="date"
+                  value={expiryDate}
+                  min={new Date().toISOString().split('T')[0]}
+                  onChange={(e) => setExpiryDate(e.target.value)}
+                  className={`w-full px-3 py-2.5 rounded-xl border text-sm text-text-primary bg-bg-primary focus:outline-none focus:ring-2 focus:ring-accent-primary/25 focus:border-accent-primary transition-all ${
+                    errors.expiryDate ? 'border-status-error' : 'border-[#DDD9D4]'
+                  }`}
+                />
+                {errors.expiryDate && (
+                  <p className="text-xs text-status-error mt-1">{errors.expiryDate}</p>
+                )}
+              </>
             )}
           </div>
         </div>

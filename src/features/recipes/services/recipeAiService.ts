@@ -1,4 +1,5 @@
 import axiosClient from '../../../shared/api/axiosClient';
+import { isMockMode } from '../../../shared/utils/mockMode';
 import type {
   Recipe,
   RecipeSuggestionParams,
@@ -6,7 +7,7 @@ import type {
   TimeOfDay,
   AiRecipeResponse,
 } from '../types/recipe.types';
-import { MOCK_RECIPES, MEAL_TIME_MAP } from '../mocks/recipeMocks';
+import { MOCK_RECIPES, MOCK_PANTRY_ITEMS, MEAL_TIME_MAP } from '../mocks/recipeMocks';
 
 // ── Time-of-day helper ────────────────────────────────────────────────────────
 
@@ -108,11 +109,21 @@ const fetchMockRecipes = (params: RecipeSuggestionParams): Recipe[] => {
     selected = [...selected, ...extras].sort((a, b) => a.timeToCook - b.timeToCook);
   }
 
-  return enrichWithPantry(selected, pantryIngredients);
+  // Use the real pantry for enrichment when available; fall back to the mock
+  // pantry so the fallback view always shows realistic inPantry flags.
+  const enrichmentPantry =
+    pantryIngredients.length > 0
+      ? pantryIngredients
+      : MOCK_PANTRY_ITEMS.map((p) => ({ name: p.name, quantity: p.quantity, unit: p.unit }));
+
+  return enrichWithPantry(selected, enrichmentPantry);
 };
 
 // ── Main service function ─────────────────────────────────────────────────────
 // Uses real AI API if VITE_AI_API_URL is set, otherwise falls back to mock data.
+// If the API doesn't respond within 10 seconds, falls back to mock immediately.
+
+const AI_TIMEOUT_MS = 10_000;
 
 export const fetchRecipeSuggestions = async (
   params: RecipeSuggestionParams
@@ -120,21 +131,27 @@ export const fetchRecipeSuggestions = async (
   const aiApiUrl = import.meta.env.VITE_AI_API_URL as string | undefined;
 
   // ── REAL API PATH ─────────────────────────────────────────────────────────
-  if (aiApiUrl) {
+  if (aiApiUrl && !isMockMode()) {
     try {
-      const response = await axiosClient.post<AiRecipeResponse>(
+      const timeout = new Promise<null>((resolve) =>
+        setTimeout(() => resolve(null), AI_TIMEOUT_MS),
+      );
+      const apiCall = axiosClient.post<AiRecipeResponse>(
         `${aiApiUrl}/recipes/suggestions`,
         params,
       );
-      return enrichWithPantry(response.data.recipes, params.pantryIngredients);
+      const result = await Promise.race([apiCall, timeout]);
+
+      if (result !== null) {
+        return enrichWithPantry(result.data.recipes, params.pantryIngredients);
+      }
+      console.warn('[recipeAiService] AI API timed out after 10s — falling back to mock data');
     } catch (error) {
       console.warn('[recipeAiService] AI API call failed, falling back to mock data:', error);
-      // Graceful fallback — don't break the UI
     }
   }
 
   // ── MOCK PATH ─────────────────────────────────────────────────────────────
-  // Simulate a realistic async delay
   await new Promise((resolve) => setTimeout(resolve, 800));
   return fetchMockRecipes(params);
 };

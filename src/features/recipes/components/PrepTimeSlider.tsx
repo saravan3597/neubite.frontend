@@ -1,4 +1,5 @@
 import React from 'react';
+import { ClockIcon } from '../../../shared/components/icons';
 
 // ── Props ─────────────────────────────────────────────────────────────────────
 
@@ -16,7 +17,8 @@ const STEPS: number[] = [20, 30, 60];
 export const PrepTimeSlider: React.FC<PrepTimeSliderProps> = ({ value, onChange }) => {
   return (
     <div className="flex items-center gap-4">
-      <span className="text-sm font-medium text-text-secondary shrink-0">
+      <span className="flex items-center gap-1.5 text-xs font-semibold text-text-primary uppercase tracking-widest shrink-0">
+        <ClockIcon className="w-3.5 h-3.5 text-accent-primary" />
         Prep under
       </span>
 
