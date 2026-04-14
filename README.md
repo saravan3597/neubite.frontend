@@ -12,6 +12,7 @@ Neubite is an AI-powered meal planning app that suggests recipes based on your p
   <tr>
     <td align="center"><img src=".github/screenshots/login.png" width="180"/><br/><sub>Login</sub></td>
     <td align="center"><img src=".github/screenshots/dashboard.png" width="180"/><br/><sub>Dashboard</sub></td>
+    <td align="center"><img src=".github/screenshots/instructions.png" width="180"/><br/><sub>Instructions</sub></td>
     <td align="center"><img src=".github/screenshots/pantry.png" width="180"/><br/><sub>Pantry</sub></td>
     <td align="center"><img src=".github/screenshots/pantry-modal.png" width="180"/><br/><sub>Add Item</sub></td>
     <td align="center"><img src=".github/screenshots/mobile.png" width="180"/><br/><sub>Mobile Nav</sub></td>
@@ -174,6 +175,7 @@ claude
 ```
 
 Key things Claude Code knows about this project:
+
 - Feature-Sliced Design folder structure under `src/features/`
 - Tailwind CSS v4 with CSS custom properties — color palette is defined in `CLAUDE.md`, never use raw hex values
 - All Cognito calls go through `features/auth/services/authService.ts` only
