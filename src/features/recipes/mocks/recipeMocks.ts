@@ -17,6 +17,7 @@ export const MOCK_PANTRY_ITEMS: PantryItem[] = [
   { id: 'mp7',  name: 'Kidney Beans',       quantity: 2,    unit: 'units',  expiryDate: '2027-06-30' },
   // Fresh produce
   { id: 'mp8',  name: 'Onion',              quantity: 6,    unit: 'units',  expiryDate: '2026-04-27' },
+  { id: 'mp8b', name: 'Spring Onion',       quantity: 6,    unit: 'units',  expiryDate: '2026-04-18' },
   { id: 'mp9',  name: 'Tomato',             quantity: 6,    unit: 'units',  expiryDate: '2026-04-20' },
   { id: 'mp10', name: 'Potato',             quantity: 4,    unit: 'units',  expiryDate: '2026-04-27' },
   { id: 'mp11', name: 'Green Chilli',       quantity: 8,    unit: 'units',  expiryDate: '2026-04-20' },

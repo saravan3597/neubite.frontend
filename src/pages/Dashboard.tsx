@@ -5,13 +5,17 @@ import { useRecipeStore } from '../shared/stores/useRecipeStore';
 import { RecipeSuggestions } from '../features/recipes/components/RecipeSuggestions';
 import { SavedRecipes } from '../features/recipes/components/SavedRecipes';
 
-// ── Stat card ─────────────────────────────────────────────────────────────────
+// ── Stats strip ───────────────────────────────────────────────────────────────
+import { BookmarkIcon, PantryIcon, GroceryIcon } from '../shared/components/icons';
 
-const StatCard = ({ label, value, sub }: { label: string; value: string | number; sub?: string }) => (
-  <div className="min-w-[148px] md:min-w-0 shrink-0 md:shrink snap-start bg-bg-primary rounded-xl border border-bg-secondary p-5">
-    <p className="text-xs font-semibold text-text-secondary uppercase tracking-wider mb-1">{label}</p>
-    <p className="text-2xl font-bold text-text-primary">{value}</p>
-    {sub && <p className="text-xs text-text-secondary mt-0.5">{sub}</p>}
+interface StatItemProps { icon: React.ReactNode; value: number; label: string; }
+const StatItem = ({ icon, value, label }: StatItemProps) => (
+  <div className="flex-1 flex items-center justify-center gap-2 py-2.5">
+    <span className="text-text-secondary">{icon}</span>
+    <div className="flex items-baseline gap-1.5">
+      <span className="text-lg font-bold text-text-primary tabular-nums">{value}</span>
+      <span className="text-xs text-text-secondary">{label}</span>
+    </div>
   </div>
 );
 
@@ -35,24 +39,12 @@ export const Dashboard: React.FC = () => {
       {/* AI recipe suggestions */}
       <RecipeSuggestions />
 
-      <div className="border-t border-bg-secondary pt-6 space-y-6">
-        {/* Stats row — horizontal scroll on mobile, 3-col grid on md+ */}
-        <div className="flex md:grid md:grid-cols-3 gap-3 md:gap-4 overflow-x-auto md:overflow-visible snap-x snap-mandatory md:snap-none scrollbar-none pb-1 md:pb-0">
-          <StatCard
-            label="Saved recipes"
-            value={savedRecipes.length}
-            sub={savedRecipes.length === 0 ? 'Favourite a recipe below' : 'recipes saved'}
-          />
-          <StatCard
-            label="Pantry items"
-            value={pantryItems.length}
-            sub={pantryItems.length === 0 ? 'Add via Pantry page' : 'ingredients tracked'}
-          />
-          <StatCard
-            label="To buy"
-            value={unpurchasedCount}
-            sub={unpurchasedCount === 0 ? 'List is clear' : 'on grocery list'}
-          />
+      <div className="space-y-4">
+        {/* Compact stats strip */}
+        <div className="bg-bg-primary rounded-2xl border border-bg-secondary flex divide-x divide-bg-secondary overflow-hidden">
+          <StatItem icon={<BookmarkIcon className="w-4 h-4" />} value={savedRecipes.length} label="saved" />
+          <StatItem icon={<PantryIcon   className="w-4 h-4" />} value={pantryItems.length}  label="in pantry" />
+          <StatItem icon={<GroceryIcon  className="w-4 h-4" />} value={unpurchasedCount}    label="to buy" />
         </div>
 
         {/* Saved / favourited recipes */}

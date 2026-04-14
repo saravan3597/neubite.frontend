@@ -3,6 +3,7 @@ import { persist } from 'zustand/middleware';
 import { v4 as uuidv4 } from 'uuid';
 import { pantryApi } from '../api/pantryApi';
 import { groceryApi } from '../api/groceryApi';
+import { isMockMode } from '../utils/mockMode';
 
 const uid = () => uuidv4();
 
@@ -21,8 +22,32 @@ export interface PantryItem {
   name: string;
   quantity: number;
   unit: PantryUnit;
-  expiryDate: string;
+  expiryDate?: string | null;
 }
+
+// ── Seed data ─────────────────────────────────────────────────────────────────
+// Shown on first load (or after a store version bump). Gives new users something
+// to explore recipes with immediately.
+
+const SEED_GROCERIES: GroceryItem[] = [
+  { id: 'sg1', name: 'Coconut Milk',  isPurchased: false },
+  { id: 'sg2', name: 'Greek Yogurt',  isPurchased: false },
+];
+
+const SEED_PANTRY: PantryItem[] = [
+  { id: 'sp1',  name: 'Rice',          quantity: 1,    unit: 'kgs',    expiryDate: null },
+  { id: 'sp2',  name: 'Spring Onion',  quantity: 6,    unit: 'units',  expiryDate: '2026-04-20' },
+  { id: 'sp3',  name: 'Onion',         quantity: 5,    unit: 'units',  expiryDate: '2026-04-27' },
+  { id: 'sp4',  name: 'Green Chilli',  quantity: 8,    unit: 'units',  expiryDate: '2026-04-20' },
+  { id: 'sp5',  name: 'Tomato',        quantity: 4,    unit: 'units',  expiryDate: '2026-04-22' },
+  { id: 'sp6',  name: 'Garlic',        quantity: 2,    unit: 'units',  expiryDate: null },
+  { id: 'sp7',  name: 'Ginger',        quantity: 2,    unit: 'units',  expiryDate: '2026-04-27' },
+  { id: 'sp8',  name: 'Eggs',          quantity: 6,    unit: 'units',  expiryDate: '2026-04-27' },
+  { id: 'sp9',  name: 'Oil',           quantity: 0.5,  unit: 'litres', expiryDate: null },
+  { id: 'sp10', name: 'Salt',          quantity: 0.5,  unit: 'kgs',    expiryDate: null },
+  { id: 'sp11', name: 'Turmeric Powder', quantity: 0.05, unit: 'kgs',  expiryDate: null },
+  { id: 'sp12', name: 'Cumin Seeds',   quantity: 0.05, unit: 'kgs',    expiryDate: null },
+];
 
 // ── Store interface ──────────────────────────────────────────────────────────
 
@@ -47,10 +72,11 @@ interface GroceryPantryState {
 export const useGroceryPantryStore = create<GroceryPantryState>()(
   persist(
     (set, get) => ({
-      groceries: [],
-      pantryItems: [],
+      groceries:   SEED_GROCERIES,
+      pantryItems: SEED_PANTRY,
 
       loadFromServer: async () => {
+        if (isMockMode()) return; // demo mode — keep seed data
         try {
           const [groceries, pantryItems] = await Promise.all([
             groceryApi.fetchAll(),
@@ -123,7 +149,7 @@ export const useGroceryPantryStore = create<GroceryPantryState>()(
               pantryApi.remove(item.id).catch(() => undefined);
               updatedPantry.splice(hitIndex, 1);
             } else {
-              pantryApi.update(item.id, { quantity: item.quantity, unit: item.unit, expiryDate: item.expiryDate }).catch(() => undefined);
+              pantryApi.update(item.id, { quantity: item.quantity, unit: item.unit, expiryDate: item.expiryDate ?? null }).catch(() => undefined);
               updatedPantry[hitIndex] = item;
             }
           });
@@ -131,6 +157,9 @@ export const useGroceryPantryStore = create<GroceryPantryState>()(
         });
       },
     }),
-    { name: 'neubite-grocery-pantry' }
+    {
+      name: 'neubite-grocery-pantry',
+      version: 2, // bump to clear old localStorage and load seed data
+    }
   )
 );

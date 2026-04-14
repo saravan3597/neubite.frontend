@@ -55,8 +55,14 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   checkSession: async () => {
+    // Only show the full-screen spinner on the very first boot (when we don't
+    // yet know if the user is authenticated). Background refreshes (e.g. called
+    // from the 401 interceptor) must not set isLoading or the whole app remounts.
+    const alreadyKnown = useAuthStore.getState().isAuthenticated ||
+                         useAuthStore.getState().user !== null;
+    if (!alreadyKnown) set({ isLoading: true });
+
     try {
-      set({ isLoading: true });
       const session = await getUserSession();
       if (session) {
         const [userDetails] = await Promise.all([fetchUserAttributes()]);

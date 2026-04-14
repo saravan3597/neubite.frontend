@@ -6,25 +6,60 @@ import { RecipeCard } from './RecipeCard';
 import { RecipeModal } from './RecipeModal';
 import { getTimeOfDay, getTimeOfDayLabel } from '../services/recipeAiService';
 import type { Recipe } from '../types/recipe.types';
+import { RefreshIcon, PantryIcon, AlertCircleIcon } from '../../../shared/components/icons';
 
-// ── Loading skeleton ──────────────────────────────────────────────────────────
+// ── Cooking step loader ───────────────────────────────────────────────────────
 
-const RecipeSkeleton = () => (
-  <div className="bg-bg-primary rounded-2xl border border-bg-secondary p-5 flex flex-col gap-4 animate-pulse">
-    <div className="flex justify-between items-start gap-4">
-      <div className="space-y-3 flex-1 pt-1">
-        <div className="h-5 bg-bg-secondary/70 rounded-lg w-full" />
-        <div className="h-5 bg-bg-secondary/70 rounded-lg w-2/3" />
+const STEPS = [
+  'Checking your pantry…',
+  'Picking recipes for you…',
+  'Calculating prep times…',
+  'Adding a pinch of magic…',
+  'Almost ready to serve…',
+];
+const STEP_MS = 1200;
+
+const RecipeLoader = () => {
+  const [step, setStep] = React.useState(0);
+  const [visible, setVisible] = React.useState(true);
+
+  React.useEffect(() => {
+    const iv = setInterval(() => {
+      setVisible(false);
+      setTimeout(() => {
+        setStep((s) => Math.min(s + 1, STEPS.length - 1));
+        setVisible(true);
+      }, 200);
+    }, STEP_MS);
+    return () => clearInterval(iv);
+  }, []);
+
+  return (
+    <div className="flex flex-col items-center justify-center py-16 gap-4">
+      <div className="flex gap-1.5">
+        {[0, 1, 2].map((i) => (
+          <span
+            key={i}
+            className="w-2 h-2 rounded-full bg-accent-primary animate-bounce"
+            style={{ animationDelay: `${i * 160}ms` }}
+          />
+        ))}
       </div>
-      <div className="w-8 h-8 rounded-full bg-bg-secondary/70 shrink-0" />
+      <div className="flex flex-col items-center gap-1">
+        <p
+          className="text-sm font-semibold text-text-primary tracking-wide transition-opacity duration-200"
+          style={{ opacity: visible ? 1 : 0 }}
+        >
+          {STEPS[step]}
+        </p>
+        <p className="text-xs text-text-secondary">This takes about a moment</p>
+      </div>
     </div>
-    <div className="flex gap-2 mt-2">
-      <div className="h-6 w-16 bg-bg-secondary/70 rounded-lg" />
-      <div className="h-6 w-16 bg-bg-secondary/70 rounded-lg" />
-      <div className="h-6 w-16 bg-bg-secondary/70 rounded-lg" />
-    </div>
-  </div>
-);
+  );
+};
+
+// Minimum ms to show the loader even if the API responds faster
+const MIN_LOADING_MS = 2800;
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
@@ -33,6 +68,23 @@ export const RecipeSuggestions: React.FC = () => {
     useRecipeSuggestions();
   const { saveRecipe, unsaveRecipe, isSaved } = useRecipeStore();
   const [selectedRecipe, setSelectedRecipe] = React.useState<Recipe | null>(null);
+
+  // Keep the loader visible for at least MIN_LOADING_MS so it doesn't flash
+  const [visibleLoading, setVisibleLoading] = React.useState(false);
+  const loadStartRef = React.useRef<number>(0);
+  React.useEffect(() => {
+    if (isLoading) {
+      loadStartRef.current = Date.now();
+      setVisibleLoading(true);
+    } else {
+      const remaining = MIN_LOADING_MS - (Date.now() - loadStartRef.current);
+      if (remaining > 0) {
+        const t = setTimeout(() => setVisibleLoading(false), remaining);
+        return () => clearTimeout(t);
+      }
+      setVisibleLoading(false);
+    }
+  }, [isLoading]);
 
   const tod      = getTimeOfDay();
   const greeting = getTimeOfDayLabel(tod);
@@ -52,17 +104,11 @@ export const RecipeSuggestions: React.FC = () => {
             <button
               id="recipe-refresh-btn"
               onClick={refresh}
-              disabled={isLoading}
+              disabled={visibleLoading}
               className="shrink-0 p-2 rounded-xl border border-bg-secondary text-text-secondary hover:border-accent-primary/40 hover:text-accent-primary disabled:opacity-40 transition-all"
               title="Refresh suggestions"
             >
-              <svg
-                className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`}
-                fill="none" stroke="currentColor" viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
+              <RefreshIcon className={`w-4 h-4 ${visibleLoading ? 'animate-spin' : ''}`} />
             </button>
           )}
         </div>
@@ -76,10 +122,7 @@ export const RecipeSuggestions: React.FC = () => {
         {isPantryEmpty ? (
           <div className="flex flex-col items-center justify-center py-12 text-center gap-3">
             <div className="w-12 h-12 bg-bg-secondary rounded-2xl flex items-center justify-center">
-              <svg className="w-6 h-6 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-                  d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10" />
-              </svg>
+              <PantryIcon className="w-6 h-6 text-text-secondary" />
             </div>
             <div>
               <p className="text-sm font-semibold text-text-primary">Your pantry is empty</p>
@@ -91,10 +134,7 @@ export const RecipeSuggestions: React.FC = () => {
         ) : error ? (
           <div className="flex flex-col items-center justify-center py-10 text-center gap-3">
             <div className="w-10 h-10 bg-status-error/10 rounded-xl flex items-center justify-center">
-              <svg className="w-5 h-5 text-status-error" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+              <AlertCircleIcon className="w-5 h-5 text-status-error" />
             </div>
             <p className="text-sm text-text-secondary">{error}</p>
             <button
@@ -104,7 +144,9 @@ export const RecipeSuggestions: React.FC = () => {
               Try again
             </button>
           </div>
-        ) : recipes.length === 0 && !isLoading ? (
+        ) : visibleLoading ? (
+          <RecipeLoader />
+        ) : recipes.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-10 text-center">
             <p className="text-sm font-medium text-text-primary mb-1">No recipes found</p>
             <p className="text-xs text-text-secondary">Try increasing the max prep time.</p>
@@ -112,24 +154,17 @@ export const RecipeSuggestions: React.FC = () => {
         ) : (
           /* Mobile: horizontal scroll carousel / Desktop: grid */
           <div className="flex md:grid gap-3 md:gap-4 overflow-x-auto md:overflow-visible snap-x snap-mandatory md:snap-none md:grid-cols-2 lg:grid-cols-3 scrollbar-none pb-2 md:pb-0">
-            {isLoading
-              ? [0, 1, 2].map((i) => (
-                  <div key={i} className="w-72 md:w-auto shrink-0 md:shrink snap-start">
-                    <RecipeSkeleton />
-                  </div>
-                ))
-              : recipes.map((recipe) => (
-                  <div key={recipe.id} className="w-72 md:w-auto shrink-0 md:shrink snap-start">
-                    <RecipeCard
-                      {...recipe}
-                      isSaved={isSaved(recipe.id)}
-                      onSave={saveRecipe}
-                      onUnsave={unsaveRecipe}
-                      onClick={() => setSelectedRecipe(recipe)}
-                    />
-                  </div>
-                ))
-            }
+            {recipes.map((recipe) => (
+              <div key={recipe.id} className="w-72 md:w-auto shrink-0 md:shrink snap-start">
+                <RecipeCard
+                  {...recipe}
+                  isSaved={isSaved(recipe.id)}
+                  onSave={saveRecipe}
+                  onUnsave={unsaveRecipe}
+                  onClick={() => setSelectedRecipe(recipe)}
+                />
+              </div>
+            ))}
           </div>
         )}
       </div>

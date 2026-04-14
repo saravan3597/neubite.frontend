@@ -70,9 +70,9 @@ export const fetchUserAttributes = async () => {
   }
 };
 
-export const getUserSession = async () => {
+export const getUserSession = async (forceRefresh = false) => {
   try {
-    const session = await fetchAuthSession();
+    const session = await fetchAuthSession({ forceRefresh });
     return session.tokens ? session : null;
   } catch {
     return null;

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import type { Recipe } from '../types/recipe.types';
 import { useGroceryPantryStore } from '../../../shared/stores/useGroceryPantryStore';
+import { CloseIcon, WarningIcon } from '../../../shared/components/icons';
 
 interface RecipeModalProps {
   recipe: Recipe | null;
@@ -69,9 +70,7 @@ export const RecipeModal: React.FC<RecipeModalProps> = ({ recipe, onClose }) => 
                 onClick={onClose}
                 className="p-1.5 -mr-1 rounded-xl text-text-secondary hover:bg-bg-secondary hover:text-accent-primary transition-colors shrink-0"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <CloseIcon className="w-5 h-5" />
               </button>
             </div>
           </div>
@@ -81,9 +80,7 @@ export const RecipeModal: React.FC<RecipeModalProps> = ({ recipe, onClose }) => 
         {showWarning ? (
           <div className="p-8 text-center flex flex-col items-center justify-center min-h-[300px]">
             <div className="w-16 h-16 bg-status-warning/10 rounded-full flex items-center justify-center mb-5 shrink-0">
-              <svg className="w-8 h-8 text-status-warning" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-              </svg>
+              <WarningIcon className="w-8 h-8 text-status-warning" />
             </div>
             <h3 className="text-2xl font-bold text-text-primary mb-2">Update Pantry?</h3>
             <p className="text-sm text-text-secondary mb-8 max-w-sm">

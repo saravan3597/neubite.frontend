@@ -151,7 +151,7 @@ export const Login: React.FC = () => {
 
                     <div className="space-y-1.5">
                       <label className="block text-sm font-semibold text-text-primary">
-                        Email <span className="text-status-error">*</span>
+                        Email
                       </label>
                       <input
                         name="email"
@@ -160,13 +160,13 @@ export const Login: React.FC = () => {
                         placeholder="you@example.com"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="w-full px-4 py-3 rounded-xl border border-bg-secondary bg-bg-primary text-base text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-accent-primary/25 focus:border-accent-primary transition-all"
+                        className="w-full px-4 py-3 rounded-xl border border-[#DDD9D4] bg-bg-primary text-base text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-accent-primary/25 focus:border-accent-primary transition-all"
                       />
                     </div>
 
                     <div className="space-y-1.5">
                       <label className="block text-sm font-semibold text-text-primary">
-                        Password <span className="text-status-error">*</span>
+                        Password
                       </label>
                       <input
                         name="password"
@@ -175,7 +175,7 @@ export const Login: React.FC = () => {
                         placeholder="••••••••"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="w-full px-4 py-3 rounded-xl border border-bg-secondary bg-bg-primary text-base text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-accent-primary/25 focus:border-accent-primary transition-all"
+                        className="w-full px-4 py-3 rounded-xl border border-[#DDD9D4] bg-bg-primary text-base text-text-primary placeholder-text-secondary focus:outline-none focus:ring-2 focus:ring-accent-primary/25 focus:border-accent-primary transition-all"
                       />
                     </div>
 
@@ -186,14 +186,14 @@ export const Login: React.FC = () => {
                     >
                       {isLoading ? 'Signing in…' : 'Sign in'}
                     </button>
+
+                    <p className="pt-2 text-xs text-text-secondary opacity-50 text-center">
+                      Terms of Service &amp; Privacy Policy
+                    </p>
                   </form>
                 </>
               )}
             </div>
-
-            <p className="mt-8 text-xs text-text-secondary opacity-50 text-center">
-              Terms of Service &amp; Privacy Policy
-            </p>
           </div>
         </div>
       </div>
