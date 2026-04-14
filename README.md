@@ -4,29 +4,29 @@ Neubite is an AI-powered meal planning app that suggests recipes based on your p
 
 **Demo mode is on by default** — no backend or AWS account needed to run and explore the app locally.
 
+![React](https://img.shields.io/badge/React_19-20232A?style=flat&logo=react&logoColor=61DAFB)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat&logo=typescript&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-646CFF?style=flat&logo=vite&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS_v4-06B6D4?style=flat&logo=tailwindcss&logoColor=white)
+![Capacitor](https://img.shields.io/badge/Capacitor-119EFF?style=flat&logo=capacitor&logoColor=white)
+![AWS Cognito](https://img.shields.io/badge/AWS_Cognito-FF9900?style=flat&logo=amazonaws&logoColor=white)
+![S3](https://img.shields.io/badge/AWS_S3_CDN-569A31?style=flat&logo=amazons3&logoColor=white)
+![Claude](https://img.shields.io/badge/Built_with_Claude_Code-D97757?style=flat&logo=anthropic&logoColor=white)
+
 ---
 
 ## Screenshots
 
-<!-- Screenshot: Login screen -->
-
-![Login](.github/screenshots/login.png)
-
-<!-- Screenshot: Dashboard — recipe suggestions -->
-
-![Dashboard](.github/screenshots/dashboard.png)
-
-<!-- Screenshot: Pantry management -->
-
-![Pantry](.github/screenshots/pantry.png)
-
-<!-- Screenshot: Pantry item addition modal -->
-
-![Pantry modal](.github/screenshots/pantry-modal.png)
-
-<!-- Screenshot: Mobile bottom nav -->
-
-![Mobile — bottom nav](.github/screenshots/mobile.png)
+<table>
+  <tr>
+    <td align="center"><img src=".github/screenshots/login.png" width="180"/><br/><sub>Login</sub></td>
+    <td align="center"><img src=".github/screenshots/dashboard.png" width="180"/><br/><sub>Dashboard</sub></td>
+    <td align="center"><img src=".github/screenshots/instructions.png" width="180"/><br/><sub>Instructions</sub></td>
+    <td align="center"><img src=".github/screenshots/pantry.png" width="180"/><br/><sub>Pantry</sub></td>
+    <td align="center"><img src=".github/screenshots/pantry-modal.png" width="180"/><br/><sub>Add Item</sub></td>
+    <td align="center"><img src=".github/screenshots/mobile.png" width="180"/><br/><sub>Mobile Nav</sub></td>
+  </tr>
+</table>
 
 ---
 
@@ -184,6 +184,7 @@ claude
 ```
 
 Key things Claude Code knows about this project:
+
 - Feature-Sliced Design folder structure under `src/features/`
 - Tailwind CSS v4 with CSS custom properties — color palette is defined in `CLAUDE.md`, never use raw hex values
 - All Cognito calls go through `features/auth/services/authService.ts` only

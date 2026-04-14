@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd /Users/saravansomanchi/Documents/projects/neubite/neubite.frontend && ./node_modules/.bin/tsc --noEmit 2>&1 | head -30"
+          }
+        ]
+      }
+    ]
+  }
+}
