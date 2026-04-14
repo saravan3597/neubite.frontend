@@ -8,25 +8,15 @@ Neubite is an AI-powered meal planning app that suggests recipes based on your p
 
 ## Screenshots
 
-<!-- Screenshot: Login screen -->
-
-![Login](.github/screenshots/login.png)
-
-<!-- Screenshot: Dashboard — recipe suggestions -->
-
-![Dashboard](.github/screenshots/dashboard.png)
-
-<!-- Screenshot: Pantry management -->
-
-![Pantry](.github/screenshots/pantry.png)
-
-<!-- Screenshot: Pantry item addition modal -->
-
-![Pantry modal](.github/screenshots/pantry-modal.png)
-
-<!-- Screenshot: Mobile bottom nav -->
-
-![Mobile — bottom nav](.github/screenshots/mobile.png)
+<table>
+  <tr>
+    <td align="center"><img src=".github/screenshots/login.png" width="180"/><br/><sub>Login</sub></td>
+    <td align="center"><img src=".github/screenshots/dashboard.png" width="180"/><br/><sub>Dashboard</sub></td>
+    <td align="center"><img src=".github/screenshots/pantry.png" width="180"/><br/><sub>Pantry</sub></td>
+    <td align="center"><img src=".github/screenshots/pantry-modal.png" width="180"/><br/><sub>Add Item</sub></td>
+    <td align="center"><img src=".github/screenshots/mobile.png" width="180"/><br/><sub>Mobile Nav</sub></td>
+  </tr>
+</table>
 
 ---
 
