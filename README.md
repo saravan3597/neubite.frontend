@@ -85,7 +85,7 @@ VITE_COGNITO_CLIENT_ID=xxxxxxxxxxxxxxxxxxxxxxxxxx
 npm run dev
 ```
 
-Open [http://localhost:5173](http://localhost:5173). You can log in with any credentials in Demo mode.
+Open [http://localhost:5173](http://localhost:5173). Use the demo credentials below to log in.
 
 ---
 
@@ -98,7 +98,7 @@ When **Demo** is active (default):
 - All API calls are skipped — no backend needed
 - Pantry is pre-seeded with mock ingredients (Rice, Onion, Chillies, etc.)
 - Recipe suggestions are generated from mock data matched to time of day
-- No Cognito credentials required
+- Login with `demo@neubite.app` / `Demo@1234` — no Cognito setup needed
 
 Switch to **Live** to connect to a real NestJS backend and Cognito user pool.
 

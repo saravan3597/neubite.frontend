@@ -159,7 +159,14 @@ export const useGroceryPantryStore = create<GroceryPantryState>()(
     }),
     {
       name: 'neubite-grocery-pantry',
-      version: 2, // bump to clear old localStorage and load seed data
+      version: 2,
+      onRehydrateStorage: () => (state) => {
+        // Always restore seed data in demo mode regardless of what localStorage has.
+        if (isMockMode() && state) {
+          state.groceries   = SEED_GROCERIES;
+          state.pantryItems = SEED_PANTRY;
+        }
+      },
     }
   )
 );
