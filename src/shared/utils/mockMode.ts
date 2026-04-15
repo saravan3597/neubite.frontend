@@ -5,11 +5,11 @@
 // Stored in sessionStorage so it resets on browser close. Toggle via the
 // "Demo / Live" pill in the sidebar.
 
-const STORAGE_KEY = 'neubite_mock_mode';
+const STORAGE_KEY = "neubite_mock_mode";
 
 /** Returns true when mock mode is active (default: true). */
 export const isMockMode = (): boolean =>
-  sessionStorage.getItem(STORAGE_KEY) !== 'false';
+  sessionStorage.getItem(STORAGE_KEY) !== "false";
 
 /** Explicitly set mock mode on or off. */
 export const setMockMode = (on: boolean): void =>

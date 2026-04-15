@@ -51,6 +51,14 @@ export const useRecipeStore = create<RecipeState>()(
         return get().savedRecipes.some((r) => r.id === id);
       },
     }),
-    { name: 'neubite-saved-recipes' }
+    {
+      name: 'neubite-saved-recipes',
+      onRehydrateStorage: () => (state) => {
+        // Clear saved recipes on demo mode load so the list starts fresh.
+        if (isMockMode() && state) {
+          state.savedRecipes = [];
+        }
+      },
+    }
   )
 );

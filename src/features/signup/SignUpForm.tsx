@@ -91,11 +91,11 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({ onToggleToLogin }) => {
               Verification Code <span className="text-status-error">*</span>
             </label>
             <input
-              type="text" inputMode="numeric" pattern="[0-9]*" required
+              type="tel" inputMode="numeric" pattern="[0-9]*" autoComplete="one-time-code" required
               className={`${inputClass} font-mono tracking-[0.4em] text-xl text-center`}
               placeholder="000000"
               value={verificationCode}
-              onChange={(e) => setVerificationCode(e.target.value)}
+              onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, ''))}
             />
           </div>
 

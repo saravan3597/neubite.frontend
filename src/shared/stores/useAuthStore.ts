@@ -1,5 +1,10 @@
 import { create } from 'zustand';
 import { handleSignIn, handleSignOut, fetchUserAttributes, getUserSession } from '../../features/auth/services/authService';
+import { isMockMode } from '../utils/mockMode';
+
+const DEMO_USER = { name: 'Demo User', email: 'demo@neubite.app' };
+const DEMO_TOKEN = 'demo-token';
+const DEMO_SESSION_KEY = 'neubite_demo_auth';
 
 interface User {
   email?: string;
@@ -27,6 +32,11 @@ export const useAuthStore = create<AuthState>((set) => ({
   isLoading: true,
 
   login: async (email, password) => {
+    if (isMockMode()) {
+      set({ isAuthenticated: true, isLoading: false, user: DEMO_USER, token: DEMO_TOKEN });
+      sessionStorage.setItem(DEMO_SESSION_KEY, 'true');
+      return;
+    }
     try {
       set({ isLoading: true });
       const { success, isSignedIn } = await handleSignIn(email, password);
@@ -45,16 +55,29 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   logout: async () => {
-    try {
-      await handleSignOut();
-    } catch {
-      // Ignore Cognito errors during sign-out (e.g. already signed out).
-      // Always clear local state so the app doesn't get stuck.
+    sessionStorage.removeItem(DEMO_SESSION_KEY);
+    if (!isMockMode()) {
+      try {
+        await handleSignOut();
+      } catch {
+        // Ignore Cognito errors during sign-out (e.g. already signed out).
+        // Always clear local state so the app doesn't get stuck.
+      }
     }
     set({ user: null, token: null, isAuthenticated: false });
   },
 
   checkSession: async () => {
+    // Demo mode — restore session from sessionStorage, skip Cognito entirely.
+    if (isMockMode()) {
+      if (sessionStorage.getItem(DEMO_SESSION_KEY) === 'true') {
+        set({ isAuthenticated: true, isLoading: false, user: DEMO_USER, token: DEMO_TOKEN });
+      } else {
+        set({ isLoading: false });
+      }
+      return;
+    }
+
     // Only show the full-screen spinner on the very first boot (when we don't
     // yet know if the user is authenticated). Background refreshes (e.g. called
     // from the 401 interceptor) must not set isLoading or the whole app remounts.
